@@ -1,5 +1,5 @@
 package model
 
-type Charactor struct {
+type Character struct {
 
 }

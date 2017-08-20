@@ -1,5 +1,5 @@
 package model
 
 type Config struct {
-	Port int
+	Port string
 }
