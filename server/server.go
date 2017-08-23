@@ -4,6 +4,7 @@ import (
 
 	"github.com/kataras/iris/websocket"
 	"fmt"
+	"time"
 )
 
 //
@@ -28,12 +29,20 @@ import (
 //}
 func HandleConnection(conn websocket.Connection)  {
 
+	log := func(text ...interface{}) {
+		fmt.Printf("[%s] (%s): %s\n", time.Now().Format("01/02 15:04:05.0"), conn.Context().RemoteAddr(), text)
+	}
 	username := ""
-	fmt.Println("connect from", conn.Context().RemoteAddr())
+	log("connect")
 	// Read events from browser
-	conn.On("login", func(name string) {
-		fmt.Println(conn.Context().RemoteAddr(), "login:", username)
-		conn.Emit("message", "login" + name)
+	conn.OnMessage(func(bytes []byte) {
+		log("message:", string(bytes))
+	})
+	conn.On("login", func(request interface{}) {
+		//request.(map[string]interface{})["username"]
+		//request.(map[string]interface{})["password"]
+		log("login")
+		conn.Emit("login", "success")
 
 		conn.On("battle", func(content string) {
 			fmt.Println(conn.Context().RemoteAddr(), "on battle:", content)
@@ -43,6 +52,6 @@ func HandleConnection(conn websocket.Connection)  {
 		})
 	})
 	conn.OnDisconnect(func() {
-		fmt.Println(conn.Context().RemoteAddr(), "disconnect")
+		log("disconnect")
 	})
 }
