@@ -28,11 +28,12 @@ import (
 //	}
 //}
 func HandleConnection(conn websocket.Connection)  {
-	log := func(text ...interface{}) {
-		fmt.Printf("[%s] (%s): %s\n", time.Now().Format("01/02 15:04:05.0"), conn.Context().RemoteAddr(), text)
+	log := func(args ...interface{}) {
+		fmt.Printf("(%s) [%s]: ", conn.Context().RemoteAddr(), time.Now().Format("01/02 15:04:05.00"))
+		fmt.Println(args...)
 	}
 
-	log("connect", "213")
+	log("connect")
 	// Auth api
 	conn.On("AUTH_LOGIN", func(request interface{}) {
 		//request.(map[string]interface{})["username"]
