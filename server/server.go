@@ -28,29 +28,23 @@ import (
 //	}
 //}
 func HandleConnection(conn websocket.Connection)  {
-
 	log := func(text ...interface{}) {
 		fmt.Printf("[%s] (%s): %s\n", time.Now().Format("01/02 15:04:05.0"), conn.Context().RemoteAddr(), text)
 	}
-	username := ""
-	log("connect")
-	// Read events from browser
-	conn.OnMessage(func(bytes []byte) {
-		log("message:", string(bytes))
-	})
-	conn.On("login", func(request interface{}) {
+
+	log("connect", "213")
+	// Auth api
+	conn.On("AUTH_LOGIN", func(request interface{}) {
 		//request.(map[string]interface{})["username"]
 		//request.(map[string]interface{})["password"]
 		log("login")
-		conn.Emit("login", "success")
+		conn.Emit("AUTH_SUCCESS", "success")
 
-		conn.On("battle", func(content string) {
-			fmt.Println(conn.Context().RemoteAddr(), "on battle:", content)
-		})
 		conn.OnDisconnect(func() {
-			fmt.Println(conn.Context().RemoteAddr(), "disconnect", username)
+			fmt.Println(conn.Context().RemoteAddr(), "disconnect")
 		})
 	})
+
 	conn.OnDisconnect(func() {
 		log("disconnect")
 	})
