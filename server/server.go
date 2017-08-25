@@ -34,7 +34,7 @@ func HandleConnection(conn websocket.Connection) {
 		fmt.Println(args...)
 	}
 
-	//log("connect")
+	log("connect")
 	// Auth api
 	conn.On("AUTH_LOGIN", func(request interface{}) {
 		username, ok1 := request.(map[string]interface{})["username"].(string)
@@ -58,6 +58,6 @@ func HandleConnection(conn websocket.Connection) {
 	})
 
 	conn.OnDisconnect(func() {
-		//log("disconnect")
+		log("disconnect")
 	})
 }

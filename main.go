@@ -2,15 +2,14 @@ package main
 
 import (
 	"github.com/kataras/iris"
-	"github.com/kataras/iris/context"
 
 	"github.com/kataras/iris/websocket"
 	"wandering-server/server"
 )
-
 func main() {
 	app := iris.New()
 
+	app.Use(iris.Gzip)
 	setupStaticServer(app)
 	setupWebsocket(app)
 
@@ -18,9 +17,10 @@ func main() {
 }
 
 func setupStaticServer(app *iris.Application) {
-	app.Get("/", func(ctx context.Context) {
-		ctx.ServeFile("./static/index.html", false) // second parameter: enable gzip?
-	})
+	//app.Get("/", func(ctx context.Context) {
+	//	ctx.ServeFile("./static/index.html", false) // second parameter: enable gzip?
+	//})
+	app.StaticWeb("/", "./static")
 	assetHandler := app.StaticHandler("./static", false, true)
 	app.SPA(assetHandler)
 }
