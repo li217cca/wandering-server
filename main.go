@@ -1,7 +1,6 @@
 package main
 
 import (
-
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/context"
 
@@ -18,7 +17,7 @@ func main() {
 	app.Run(iris.Addr(":8080"))
 }
 
-func setupStaticServer(app *iris.Application)  {
+func setupStaticServer(app *iris.Application) {
 	app.Get("/", func(ctx context.Context) {
 		ctx.ServeFile("./static/index.html", false) // second parameter: enable gzip?
 	})

@@ -1,10 +1,10 @@
 package server
 
 import (
-
-	"github.com/kataras/iris/websocket"
 	"fmt"
+	"github.com/kataras/iris/websocket"
 	"time"
+	"wandering-server/model"
 )
 
 //
@@ -27,26 +27,37 @@ import (
 //		go HandleConnection(conn)
 //	}
 //}
-func HandleConnection(conn websocket.Connection)  {
+
+func HandleConnection(conn websocket.Connection) {
 	log := func(args ...interface{}) {
 		fmt.Printf("(%s) [%s]: ", conn.Context().RemoteAddr(), time.Now().Format("01/02 15:04:05.00"))
 		fmt.Println(args...)
 	}
 
-	log("connect")
+	//log("connect")
 	// Auth api
 	conn.On("AUTH_LOGIN", func(request interface{}) {
-		//request.(map[string]interface{})["username"]
-		//request.(map[string]interface{})["password"]
-		log("login")
-		conn.Emit("AUTH_SUCCESS", "success")
-
-		conn.OnDisconnect(func() {
-			fmt.Println(conn.Context().RemoteAddr(), "disconnect")
-		})
+		username, ok1 := request.(map[string]interface{})["username"].(string)
+		password, ok2 := request.(map[string]interface{})["password"].(string)
+		if !(ok1 && ok2) {
+			conn.Emit("AUTH_ERROR", "输入格式不正确")
+			return
+		}
+		user := model.User{}
+		err := db.Model(&model.User{}).Where(model.User{
+			Username: username,
+			Password: password,
+		}).First(&user).Error
+		if err != nil {
+			conn.Emit("AUTH_ERROR", "用户名或密码错误")
+			return
+		}
+		conn.Emit("AUTH_SUCCESS", "登陆成功")
+		//go HandleUser(conn, user)
+		HandleUser(conn, user)
 	})
 
 	conn.OnDisconnect(func() {
-		log("disconnect")
+		//log("disconnect")
 	})
 }
