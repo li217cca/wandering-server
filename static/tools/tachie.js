@@ -101,6 +101,7 @@ const funs = [
             (offset.x+ "px ") +
             (offset.y+ "px")
         drog.prePos = {x: 0, y: 0}
+        return true
     },
     () => {
         tachie.big_transform = {
@@ -117,6 +118,7 @@ const funs = [
             (offset.x+ "px ") +
             (offset.y+ "px")
         drog.prePos = {x: 0, y: 0}
+        return true
     },
     () => {
         tachie.battle_transform = {
@@ -133,6 +135,7 @@ const funs = [
             (offset.x+ "px ") +
             (offset.y+ "px")
         drog.prePos = {x: 0, y: 0}
+        return true
     },
     () => {
         tachie.card_transform = {
@@ -141,9 +144,13 @@ const funs = [
         }
         console.log(tachie)
         console.log("over!")
+        return false
     }
 ]
 function next() {
-    funs[tachie.step]()
-    tachie.step ++
+    if (true) {
+        if (funs[tachie.step]()) {
+            tachie.step ++
+        }
+    }
 }

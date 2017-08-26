@@ -22,6 +22,7 @@ func init() {
 		&User{},
 		&Town{},
 		&Tachie{},
+		&History{},
 	)
 	// Skills 外键 Skill.CharID -> Character.ID
 	//DB.Model(&Skill{}).AddForeignKey("char_id", "characters(id)", "CASCADE", "CASCADE")
