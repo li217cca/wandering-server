@@ -2,30 +2,31 @@ package server
 
 import (
 	"github.com/jinzhu/gorm"
-	"wandering-server/model"
-	"time"
 	"math"
+	"time"
+	"wandering-server/model"
+	"wandering-server/common"
 )
 
 var (
-	db *gorm.DB
+	db        *gorm.DB
 	beginYear model.History
-	nowTime model.Time
+	nowTime   *model.Time
 )
 
-func getTime() (model.Time)  {
+func getTime() *model.Time {
 	hour := time.Now().Hour()
 	weather := ""
-	if (hour < 6) {
-		weather = model.WEATHER_WINTER
-	} else if (hour < 12) {
-		weather = model.WEATHER_SPRING
-	} else if (hour < 18) {
-		weather = model.WEATHER_SUMMER
+	if hour < 6 {
+		weather = common.WEATHER_WINTER
+	} else if hour < 12 {
+		weather = common.WEATHER_SPRING
+	} else if hour < 18 {
+		weather = common.WEATHER_SUMMER
 	} else {
-		weather = model.WEATHER_AUTUMN
+		weather = common.WEATHER_AUTUMN
 	}
-	return model.Time{
+	return &model.Time{
 		int(math.Floor(time.Now().Sub(beginYear.Date).Hours()) / 24),
 		weather,
 		hour % 6,
@@ -37,7 +38,7 @@ func init() {
 	if db.Model(model.History{}).Where(model.History{Name: "BEGIN_YEAR"}).Find(&beginYear).RecordNotFound() {
 		beginYear = model.History{
 			Name: "BEGIN_YEAR",
-			Date: time.Date(2017, 8, 16, 0, 0, 0, 0,time.Local),
+			Date: time.Date(2017, 8, 16, 0, 0, 0, 0, time.Local),
 			//Date: time.Now(),
 		}
 		db.Create(&beginYear)
@@ -47,7 +48,7 @@ func init() {
 		ticker := time.NewTicker(time.Second * 1)
 		for {
 			nowTime = getTime()
-			<- ticker.C
+			<-ticker.C
 		}
 	}()
 }

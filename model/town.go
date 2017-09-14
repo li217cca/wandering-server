@@ -8,7 +8,7 @@ type Coordinate struct {
 }
 
 type Town struct {
-	ID     int `json:"id"`
-	Name   string `json:"name";gorm:"not null;unique"`
+	ID       int         `json:"id"`
+	Name     string      `json:"name";gorm:"not null;unique"`
 	Position image.Point `json:"position"`
 }

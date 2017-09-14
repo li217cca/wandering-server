@@ -6,6 +6,7 @@ import (
 	"github.com/kataras/iris/websocket"
 	"wandering-server/server"
 )
+
 func main() {
 	app := iris.New()
 
@@ -17,7 +18,7 @@ func main() {
 }
 
 func setupStaticServer(app *iris.Application) {
-	//app.Get("/", func(ctx context.Context) {
+	//app.Get("/", func(ctx handler.Context) {
 	//	ctx.ServeFile("./static/index.html", false) // second parameter: enable gzip?
 	//})
 	app.StaticWeb("/", "./static")

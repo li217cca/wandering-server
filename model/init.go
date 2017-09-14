@@ -8,6 +8,7 @@ import (
 
 var (
 	DB *gorm.DB
+	Maps map[int]Map
 )
 
 func init() {
@@ -21,9 +22,22 @@ func init() {
 		&Skill{},
 		&User{},
 		&Town{},
-		&Tachie{},
+		&Map{},
+		&Line{},
 		&History{},
+		&Game{},
+		&Item{},
 	)
+
+	var ms []Map
+	DB.Model(&Map{}).Find(&ms)
+	for i, _ := range ms {
+		var borders []Line
+		DB.Model(&Line{}).Where("parent_id = ?", ms[i].ID).Find(&borders)
+		for _, b := range borders {
+			ms[i].Borders = append(ms[i].Borders, b.Vector)
+		}
+	}
 	// Skills 外键 Skill.CharID -> Character.ID
 	//DB.Model(&Skill{}).AddForeignKey("char_id", "characters(id)", "CASCADE", "CASCADE")
 	//DB.Model(&Character{}).AddForeignKey("user_id", "users(id)", "CASCADE", "CASCADE")
