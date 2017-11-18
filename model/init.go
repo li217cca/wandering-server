@@ -27,6 +27,9 @@ func init() {
 		&User{},
 		&Game{},
 		&Item{},
+		&Map{},
+		&Resource{},
+		&Route{},
 	)
 
 	fmt.Println("Model init success..")

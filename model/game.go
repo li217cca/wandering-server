@@ -8,4 +8,5 @@ type Game struct {
 	UserID int    `json:"user_id"` // 用户ID
 	Name   string `json:"name"`    // 名称
 	BagID  int    `json:"-"`       // 背包ID
+	MapID  int    `json:"-"`
 }
