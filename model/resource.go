@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -8,42 +9,77 @@ import (
 type Resource struct {
 	ID    int `json:"id"`
 	MapID int `json:"map_id"`
-	Type  int `json:"type"`
+	Type  int `json:"type" gorm:"not null"`
 
-	Level         int       `json:"level"`
-	Quantity      float64   `json:"quantity"`
-	QuantityLimit float64   `json:"quantity_limit"`
+	Level         int `json:"level"`
+	Quantity      float64
+	QuantityLimit float64
 	RecoverySpeed float64   `json:"recovery_speed"`
-	PreTime       time.Time `json:"pre_time"`
+	PreTime       time.Time `json:"pre_time" gorm:"not null"`
 }
 
-func (res *Resource) commit() error {
-	if (DB.Where(Resource{ID: res.ID}).RecordNotFound()) {
-		return DB.Model(res).Create(&res).Error
-	}
-	return DB.Where(Resource{ID: res.ID}).Update(&res).Error
+/*
+Resource.commit
+Type: not pure
+UnitTest: false
+*/
+func (res *Resource) commit() {
+	DB.Save(&res)
 }
+
+/*
+Resource.delete
+Type: not pure
+UnitTest: true
+*/
 func (res *Resource) delete() error {
-	return DB.Where(Resource{ID: res.ID}).Delete(&res).Error
+	if num := DB.Where("id = ?", res.ID).Delete(&res).RowsAffected; num != 1 {
+		return fmt.Errorf("\nResource.delete 01 \nRowsAffected = %d", num)
+	}
+	return nil
 }
 
-// 恢复资源
-func (res *Resource) recovery() error {
-	res.Quantity += time.Now().Sub(res.PreTime).Hours() * res.RecoverySpeed / 24.
-	res.PreTime = time.Now()
+/*
+Resource.recovery
+Type: pure
+UnitTest: true
+*/
+func (res *Resource) recovery() {
+	diff := time.Now().Sub(res.PreTime).Hours() * res.RecoverySpeed / 24.
+	res.Quantity += diff
 	if res.Quantity > res.QuantityLimit {
 		res.Quantity = res.QuantityLimit
 	}
-	return res.commit()
+	res.PreTime = time.Now()
 }
 
-// GetResourcesByMapID 获得所有关于MapID的资源，并自动恢复资源
-func GetResourcesByMapID(MapID int) (ress []Resource, err error) {
-	err = DB.Where(Resource{MapID: MapID}).Find(&ress).Error
-	for index := range ress {
-		if err = ress[index].recovery(); err != nil {
-			return
-		}
+/*
+GetResourceByID Get resource by Resource.ID
+Type: not pure
+UnitTest: true
+*/
+func GetResourceByID(ID int) (res Resource, err error) {
+	if err = DB.Where("id = ?", ID).First(&res).Error; err != nil {
+		return res, fmt.Errorf("\nGetResourceByID 01 \n%v", err)
 	}
-	return
+	return res, nil
+}
+
+/*
+NewResource ...
+Type: not pure
+UnitTest: false
+*/
+func NewResource(mapID int, Type int, level int, Quantity float64, QuantityLimit float64, RecoverySpeed float64, PreTime time.Time) Resource {
+	res := Resource{
+		MapID:         mapID,
+		Type:          Type,
+		Level:         level,
+		Quantity:      Quantity,
+		QuantityLimit: QuantityLimit,
+		RecoverySpeed: RecoverySpeed,
+		PreTime:       PreTime,
+	}
+	res.commit()
+	return res
 }

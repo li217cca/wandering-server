@@ -32,9 +32,9 @@ func newGameContext(ctx *userContext, game model.Game) (gCtx gameContext, err er
 			Info: game,
 		},
 	}
-	if gCtx.Game.Bag, err = model.GetBagByID(game.BagID); err != nil {
-		return gCtx, err
-	}
+	// if gCtx.Game.Bag, err = model.GetBagByID(game.BagID); err != nil {
+	// 	return gCtx, err
+	// }
 	if gCtx.Game.Map, err = model.GetMapByID(game.MapID); err != nil {
 		return gCtx, err
 	}
@@ -46,8 +46,8 @@ func handleGame(pctx *userContext, game model.Game) error {
 	if err != nil {
 		return err
 	}
-
 	ctx.Log("GAME_CONN")
+
 	// TODO: 交互游戏信息
 	return nil
 }

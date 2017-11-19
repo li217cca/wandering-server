@@ -24,9 +24,10 @@ func init() {
 	DB.AutoMigrate(
 		&Skill{},
 		&Bag{},
+		&Item{},
 		&User{},
 		&Game{},
-		&Item{},
+		&Charactor{},
 		&Map{},
 		&Resource{},
 		&Route{},

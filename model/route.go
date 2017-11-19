@@ -6,13 +6,20 @@ import (
 
 // Route Map's edge
 type Route struct {
-	ID       int `json:"id"`
-	SourceID int `json:"source_id"`
-	TargetID int `json:"target_id"`
+	ID       int
+	SourceID int
+	TargetID int
 }
 
 func (route *Route) delete() error {
-	return DB.Where(Route{ID: route.ID}).Delete(&route).Error
+	if num := DB.Where("id = ?", route.ID).Delete(&route).RowsAffected; num != 1 {
+		return fmt.Errorf("\nRoute.delete 01 \nRowsAffected = %d", num)
+	}
+	return nil
+}
+
+func (route *Route) commit() {
+	DB.Save(&route)
 }
 
 // CreateRoute Create map single link to map
@@ -21,4 +28,18 @@ func CreateRoute(SourceID int, TargetID int) error {
 		return fmt.Errorf("Route %d to %d already existed", SourceID, TargetID)
 	}
 	return DB.Model(Route{}).Create(&Route{SourceID: SourceID, TargetID: TargetID}).Error
+}
+
+/*
+NewRoute ...
+Type: not pure
+UnitTest: false
+*/
+func NewRoute(sourceID int, targetID int) Route {
+	route := Route{
+		SourceID: sourceID,
+		TargetID: targetID,
+	}
+	route.commit()
+	return route
 }

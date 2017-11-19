@@ -65,9 +65,11 @@ func handleUser(pctx *connContext, user model.User) error {
 		if !db.Model(model.Game{}).Where("name = ?", name).RecordNotFound() {
 			ctx.EmitError("角色名已存在！")
 		}
+		mp := model.NewMap(common.NewGameGiftLucky+common.GetTodayLucky(), 0)
 		game := model.Game{
 			UserID: ctx.User.ID,
 			Name:   name,
+			MapID:  mp.ID,
 		} // TODO: 新建角色相关 数量上限
 		if err := db.Model(model.Game{}).Create(&game).Error; err != nil {
 			ctx.Log(err)

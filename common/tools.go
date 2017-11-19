@@ -21,3 +21,9 @@ func GenerateKey(len int) string {
 	}
 	return string(str)
 }
+
+// GetTodayLucky ...
+func GetTodayLucky() int {
+	r := GetRand()
+	return r.Intn(100) + 0
+}
