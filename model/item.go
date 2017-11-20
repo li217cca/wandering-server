@@ -7,7 +7,7 @@ import (
 // Item Item struct
 type Item struct {
 	ID    int `gorm:"primary_key"`
-	BagID int `gorm:"foreign_key"`
+	BagID int 
 
 	Name     string  `json:"name" gorm:"not null"`
 	Type     int     `json:"type" gorm:"not null"`

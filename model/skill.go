@@ -24,18 +24,6 @@ const (
 	SkillHitPointID    = 200
 )
 
-func (skill *Skill) commit() {
-	DB.Where("id = ?", skill.ID).FirstOrCreate(&skill)
-	DB.Model(skill).Update(&skill)
-}
-func (skill *Skill) delete() error {
-	if num := DB.Where("id = ?", skill.ID).Delete(&skill).RowsAffected; num != 1 {
-		err := fmt.Errorf("RowsAffected = %d", num)
-		return fmt.Errorf("Skill.delete 01\n %v", err)
-	}
-	return nil
-}
-
 func (skill *Skill) preCalcBagWeight() float64 {
 	switch skill.Type {
 	case SkillBagWeightID:
@@ -75,7 +63,6 @@ func (skill *Skill) levelUp(diff int) {
 		skill.Level = 0
 	}
 	skill.calcExpLimit()
-	skill.commit()
 }
 
 // addExp commited
@@ -91,7 +78,9 @@ func (skill *Skill) addExp(exp int) (err error) {
 	return nil
 }
 
-// NewSkill commited
+/*
+NewSkill New a skill
+*/
 func NewSkill(Name string, TypeID int, Level int) Skill {
 	skill := Skill{
 		Name:      Name,
@@ -100,21 +89,5 @@ func NewSkill(Name string, TypeID int, Level int) Skill {
 		Potential: 1,
 	}
 	skill.calcExpLimit()
-	skill.commit()
 	return skill
-}
-
-// NewBodySkill commited
-func NewBodySkill(Name string, Level int) Skill {
-	return NewSkill(Name, SkillHitPointID, Level)
-}
-
-// NewCapacitySkill commited
-func NewCapacitySkill(Name string, Level int) Skill {
-	return NewSkill(Name, SkillBagCapacityID, Level)
-}
-
-// NewWeightSkill commited
-func NewWeightSkill(Name string, Level int) Skill {
-	return NewSkill(Name, SkillBagWeightID, Level)
 }

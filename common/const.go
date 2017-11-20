@@ -2,5 +2,5 @@ package common
 
 // NewGameGiftLucky
 const (
-	NewGameGiftLucky = 300
+	NewGameGiftLucky = 50
 )

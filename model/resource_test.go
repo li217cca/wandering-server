@@ -2,85 +2,9 @@ package model
 
 import (
 	"math"
-	"reflect"
 	"testing"
 	"time"
 )
-
-func TestResource_delete(t *testing.T) {
-	res := Resource{
-		Level: 11,
-	}
-	res.commit()
-	tests := []struct {
-		name    string
-		res     *Resource
-		wantErr bool
-	}{
-		{
-			name:    "1",
-			res:     &Resource{},
-			wantErr: true,
-		},
-		{
-			name:    "2",
-			res:     &res,
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.res.delete(); (err != nil) != tt.wantErr {
-				t.Errorf("Resource.delete() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestGetResourceByID(t *testing.T) {
-	res := Resource{
-		MapID:   0,
-		Type:    1,
-		Level:   11,
-		PreTime: time.Now(),
-	}
-	res.commit()
-	type args struct {
-		ID int
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantRes Resource
-		wantErr bool
-	}{
-		{
-			name:    "1",
-			args:    args{ID: 0},
-			wantRes: Resource{},
-			wantErr: true,
-		},
-		{
-			name:    "2",
-			args:    args{ID: res.ID},
-			wantRes: res,
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			gotRes, err := GetResourceByID(tt.args.ID)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("\nGetResourceByID() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			gotRes.PreTime = tt.wantRes.PreTime
-			if !reflect.DeepEqual(gotRes, tt.wantRes) {
-				t.Errorf("\nGetResourceByID() = %v, want %v", gotRes, tt.wantRes)
-			}
-		})
-	}
-}
 
 func TestResource_recovery(t *testing.T) {
 	pre := time.Now()
@@ -122,6 +46,40 @@ func TestResource_recovery(t *testing.T) {
 			if math.Abs(tt.res.Quantity-tt.wantRes.Quantity) > 1e-6 {
 				t.Errorf("\nResource.recovery() = %v, want %v", tt.res, tt.wantRes)
 			}
+		})
+	}
+}
+
+func Test_randomResourceType(t *testing.T) {
+	type args struct {
+		miracle int
+		danger  int
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "1",
+			args: args{miracle: 7000, danger: 1},
+		},
+		{
+			name: "1",
+			args: args{miracle: 7000, danger: 50},
+		},
+		{
+			name: "1",
+			args: args{miracle: 7000, danger: 100},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			return
+			set := map[int]int{}
+			for i := 0; i < 100000; i++ {
+				set[randomResourceType(tt.args.miracle, tt.args.danger)]++
+			}
+			t.Errorf("\nMiracle %d Danger %d = Set %v", tt.args.miracle, tt.args.danger, set)
 		})
 	}
 }

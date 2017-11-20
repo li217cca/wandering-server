@@ -19,7 +19,7 @@ type userContext struct {
 // 新建用户内容实体
 func newUserContext(ctx *connContext, user model.User) (userContext, error) {
 	logger := func(args ...interface{}) {
-		fmt.Printf("(%s) [%s]: ", ctx.Conn.Context().RemoteAddr(), time.Now().Format("01/02 15:04:05.00"))
+		fmt.Printf("(%s) [%s] %s: ", ctx.Conn.Context().RemoteAddr(), time.Now().Format("01/02 15:04:05.00"), user.Username)
 		fmt.Println(args...)
 	}
 	return userContext{
@@ -39,44 +39,42 @@ func (ctx *userContext) OnSelect(messageFunc websocket.MessageFunc) {
 func (ctx *userContext) OnCreate(messageFunc websocket.MessageFunc) {
 	ctx.Conn.On(common.GAME_CREATE, messageFunc)
 }
+func (ctx *userContext) sendGames() {
+	var games []model.Game
+	db.Model(&ctx.User).Related(&games)
+	ctx.Conn.Emit(common.GAME_RECEIPT_LIST, games)
+}
 
 func handleUser(pctx *connContext, user model.User) error {
 	ctx, err := newUserContext(pctx, user)
 	if err != nil {
-		return err
+		return fmt.Errorf("\nhandleUser 01 %v", err)
 	}
 	ctx.Log("login")
 
-	games := []model.Game{}
-	if err := db.Model(&model.Game{}).Where("user_id = ?", ctx.User.ID).Find(&games).Error; err != nil {
-		return err
-	}
-	ctx.Conn.Emit(common.GAME_RECEIPT, games)
+	ctx.sendGames()
+
 	ctx.OnSelect(func(gameID int) {
+		ctx.Log("handUser OnSelect gameID=", gameID)
 		game := model.Game{}
 		if err := db.Model(model.Game{}).Where("id = ?", gameID).Find(&game).Error; err != nil {
-			ctx.Log(err)
+			ctx.Log(fmt.Errorf("\nhandleUser ctx.OnSelect 01 \n%v", err))
 		}
 		if err := handleGame(&ctx, game); err != nil {
-			ctx.Log(err)
+			ctx.Log(fmt.Errorf("\nhandleUser ctx.OnSelect 02 \n%v", err))
 		}
 	})
 	ctx.OnCreate(func(name string) {
-		if !db.Model(model.Game{}).Where("name = ?", name).RecordNotFound() {
-			ctx.EmitError("角色名已存在！")
-		}
-		mp := model.NewMap(common.NewGameGiftLucky+common.GetTodayLucky(), 0)
-		game := model.Game{
-			UserID: ctx.User.ID,
-			Name:   name,
-			MapID:  mp.ID,
-		} // TODO: 新建角色相关 数量上限
-		if err := db.Model(model.Game{}).Create(&game).Error; err != nil {
-			ctx.Log(err)
+		ctx.Log("handUser OnCreate name=", name)
+		game, err := model.NewNativeGame(ctx.User.ID, name)
+		if err != nil {
+			ctx.Log(fmt.Errorf("\nhandleUser ctx.OnCreate 01 %v", err))
+			return
 		}
 		if err := handleGame(&ctx, game); err != nil {
-			ctx.Log(err)
+			ctx.Log(fmt.Errorf("\nhandleUser ctx.OnCreate 02 %v", err))
 		}
+		ctx.sendGames()
 	})
 	return nil
 }

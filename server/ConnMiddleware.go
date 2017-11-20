@@ -73,12 +73,12 @@ func HandleConnection(conn websocket.Connection) {
 		}
 		if err := db.Model(model.User{}).Create(&user).Error; err != nil {
 			ctx.EmitError("未知错误" + err.Error())
-			ctx.Log(err)
+			ctx.Log(fmt.Errorf("\n HandleConnection 01 \n%v", err))
 			return
 		}
 		ctx.EmitSuccess("注册成功")
 		if err := handleUser(&ctx, user); err != nil {
-			ctx.Log(err)
+			ctx.Log(fmt.Errorf("\n HandleConnection 02 \n%v", err))
 		}
 	})
 	ctx.OnLogin(func(request interface{}) {

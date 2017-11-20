@@ -52,13 +52,14 @@ func limitAddFloat64(value *float64, limit *float64, inc float64) (diff int, err
 Charactor Charactor struct
 */
 type Charactor struct {
-	ID     int `json:"id"`
-	GameID int `json:"game_id"`
-	InTeam int `json:"in_team"`
+	ID     int    `json:"id"`
+	GameID int    `json:"game_id"`
+	Name   string `gorm:"not null"`
+	InTeam int    `json:"in_team" gorm:"not null"`
 
 	HitPoint      int
 	HitPointLimit int
-	Skills        []Skill `json:"skills" gorm:"-"`
+	Skills        []Skill
 }
 
 /*
@@ -68,15 +69,6 @@ const (
 	CharIsInTeam  = 1
 	CharNotInTeam = -1
 )
-
-/*
-Charactor.commitWithoutChildren
-Type: not pure
-UnitTest: false
-*/
-func (char *Charactor) commitWithoutChildren() {
-	DB.Save(&char)
-}
 
 /*
 Charactor.refreshHitPoint
@@ -94,47 +86,17 @@ func (char *Charactor) refreshHitPoint(Skills []Skill) {
 }
 
 /*
-Charactor.commit
-Type: not pure
-UnitTest: false
-*/
-func (char *Charactor) commit() {
-	for index := range char.Skills {
-		char.Skills[index].commit()
-	}
-	char.commitWithoutChildren()
-}
-
-func (char *Charactor) delete() error {
-	for index := range char.Skills {
-		if err := char.Skills[index].delete(); err != nil {
-			return fmt.Errorf("Charactor.delete 01\n %v", err)
-		}
-	}
-	if num := DB.Model(char).Where("id = ?", char.ID).Delete(&char).RowsAffected; num != 1 {
-		return fmt.Errorf("Charactor.delete 02\n RowsAffected = %d", num)
-	}
-	return nil
-}
-
-/*
 NewCharactor New a Charactor{GameID, Inteam, Skills}
-Type: not pure
+Type: pure
 UnitTest: false
 */
-func NewCharactor(gameID int, inTeam int, skills []Skill) Charactor {
+func NewCharactor(gameID int, name string, inTeam int) Charactor {
 	char := Charactor{
 		GameID:        gameID,
+		Name:          name,
 		InTeam:        inTeam,
 		HitPoint:      10,
 		HitPointLimit: 10,
-		Skills:        skills,
 	}
-	char.refreshHitPoint(skills)
-	char.commitWithoutChildren()
-	for index := range skills {
-		skills[index].CharactorID = char.ID
-	}
-	char.commit()
 	return char
 }

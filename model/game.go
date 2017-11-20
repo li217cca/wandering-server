@@ -11,40 +11,49 @@ type Game struct {
 	ID     int    `json:"id"`      // 游戏ID
 	UserID int    `json:"user_id"` // 用户ID
 	Name   string `json:"name"`    // 名称
-	BagID  int    `json:"bag_id"`  // 背包ID
-	MapID  int    `json:"map_id"`  // 地图ID
+	BagID  int
+	MapID  int
+	Maps   []Map `gorm:"many2many:game_maps"`
 }
 
-// commit not pure : save state to database
-func (game *Game) commit() error {
-	if DB.Where(Game{ID: game.ID}).RecordNotFound() {
-		return DB.Model(game).Create(&game).Error
-	}
-	return DB.Where(Game{ID: game.ID}).Update(&game).Error
-}
-
-// func NewGame(UserID int, Name string, mp Map, bag Bag, Chars []Charactor) (game Game, err error) {
-// }
-
-// NewNativeGame ...
+/*
+NewNativeGame New a native game
+Type: not pure
+UnitTest: false
+*/
 func NewNativeGame(UserID int, Name string) (game Game, err error) {
+	// init map
 	mp := NewMap(common.NewGameGiftLucky+common.GetTodayLucky(), 0)
-	bag := NewBag()
+	DB.Save(&mp)
 
+	// init skill
+	skills := []Skill{
+		NewSkill("Body", SkillHitPointID, 0),
+	}
+	for index := range skills {
+		DB.Save(&skills[index])
+	}
+
+	// init bag
+	bag := NewBag()
+	bag.calcCapacityWeight(skills)
+	DB.Save(&bag)
+
+	// init game
 	game = Game{
 		UserID: UserID,
 		Name:   Name,
+		BagID:  bag.ID,
 		MapID:  mp.ID,
-		//BagID:  bag.ID,
+		Maps:   []Map{mp},
 	}
-	game.commit()
-	body := NewBodySkill("Body", 0)
+	DB.Save(&game)
 
-	skills := []Skill{
-		body,
-	}
-	char := NewCharactor(0, CharNotInTeam, skills)
-	bag.calcCapacityWeight(char.Skills)
+	// init char
+	char := NewCharactor(game.ID, Name, CharNotInTeam)
+	char.Skills = skills
+	char.refreshHitPoint(skills)
+	DB.Save(&char)
 	// TODO: 更改各种方法为纯函数，编写单元测试
 	return game, err
 }

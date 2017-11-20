@@ -21,7 +21,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	DB.AutoMigrate(
+	if err = DB.AutoMigrate(
 		&Skill{},
 		&Bag{},
 		&Item{},
@@ -31,7 +31,9 @@ func init() {
 		&Map{},
 		&Resource{},
 		&Route{},
-	)
+	).Error; err != nil {
+		fmt.Printf("model.init() error 01 %v\n", err)
+	}
 
 	fmt.Println("Model init success..")
 }
