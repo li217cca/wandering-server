@@ -4,12 +4,12 @@ package model
 Bag Bag's struct
 */
 type Bag struct {
-	ID            int `json:"id"`
-	Capacity      int
-	CapacityLimit int
-	Weight        float64
-	WeightLimit   float64
-	Items         []Item `gorm:"ForeignKey"`
+	ID            int     `json:"id,omitempty"`
+	Capacity      int     `json:"capacity,omitempty"`
+	CapacityLimit int     `json:"capacity_limit,omitempty"`
+	Weight        float64 `json:"weight,omitempty"`
+	WeightLimit   float64 `json:"weight_limit,omitempty"`
+	Items         []Item  `gorm:"ForeignKey" json:"items,omitempty"`
 }
 
 /*

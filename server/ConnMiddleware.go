@@ -37,8 +37,11 @@ func (ctx *connContext) EmitSuccess(msg string) {
 func (ctx *connContext) OnLogin(messageFunc websocket.MessageFunc) {
 	ctx.Conn.On(common.AUTH_LOGIN, messageFunc)
 }
-func (ctx *connContext) OnSignin(messageFunc websocket.MessageFunc) {
-	ctx.Conn.On(common.AUTH_SIGNIN, messageFunc)
+func (ctx *connContext) OnSignup(messageFunc websocket.MessageFunc) {
+	ctx.Conn.On(common.AUTH_SIGNUP, messageFunc)
+}
+func (ctx *connContext) OnBind(messageFunc websocket.MessageFunc) {
+	ctx.Conn.On(common.AUTH_BIND, messageFunc)
 }
 
 // HandleConnection ...
@@ -46,7 +49,24 @@ func HandleConnection(conn websocket.Connection) {
 	ctx := newConnContext(conn)
 	ctx.Log("connect")
 
-	ctx.OnSignin(func(request interface{}) {
+	ctx.OnBind(func(token string) {
+		ctx.Log("Bind token=\"" + token + "\"")
+		userID, err := model.ParseUserToken(token)
+		if err != nil {
+			ctx.EmitError("Token 无效")
+			return
+		}
+		var user model.User
+		if err = db.Where("id = ?", userID).First(&user).Error; err != nil {
+			ctx.EmitError("Token 无效")
+			return
+		}
+		ctx.EmitSuccess("登陆成功")
+		if err := handleUser(&ctx, user); err != nil {
+			ctx.Log(fmt.Errorf("\n HandleConnection OnBind 01 \n%v", err))
+		}
+	})
+	ctx.OnSignup(func(request interface{}) {
 		reqmap := request.(map[string]interface{})
 		username, ok1 := reqmap["username"].(string)
 		password, ok2 := reqmap["password"].(string)
@@ -67,18 +87,15 @@ func HandleConnection(conn websocket.Connection) {
 			ctx.EmitError("用户名已存在！")
 			return
 		}
-		user = model.User{
-			Username: username,
-			Password: password,
-		}
+		user = model.NewUser(username, password)
 		if err := db.Model(model.User{}).Create(&user).Error; err != nil {
 			ctx.EmitError("未知错误" + err.Error())
-			ctx.Log(fmt.Errorf("\n HandleConnection 01 \n%v", err))
+			ctx.Log(fmt.Errorf("\n HandleConnection OnSignup 01 \n%v", err))
 			return
 		}
 		ctx.EmitSuccess("注册成功")
 		if err := handleUser(&ctx, user); err != nil {
-			ctx.Log(fmt.Errorf("\n HandleConnection 02 \n%v", err))
+			ctx.Log(fmt.Errorf("\n HandleConnection OnSignup 03 \n%v", err))
 		}
 	})
 	ctx.OnLogin(func(request interface{}) {
@@ -95,7 +112,7 @@ func HandleConnection(conn websocket.Connection) {
 		}
 		ctx.EmitSuccess("登陆成功")
 		if err := handleUser(&ctx, user); err != nil {
-			ctx.Log(err)
+			ctx.Log(fmt.Errorf("\n HandleConnection OnLogin 02 \n%v", err))
 		}
 	})
 

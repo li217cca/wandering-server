@@ -6,13 +6,12 @@ import (
 
 // Item Item struct
 type Item struct {
-	ID    int `gorm:"primary_key"`
-	BagID int 
-
-	Name     string  `json:"name" gorm:"not null"`
-	Type     int     `json:"type" gorm:"not null"`
-	Capacity int     `json:"capacity" gorm:"capacity"`
-	Weight   float64 `json:"weight"   gorm:"weight"`
+	ID       int     `json:"id,omitempty"       gorm:"primary_key"`
+	BagID    int     `json:"bag_id,omitempty"`
+	Name     string  `json:"name,omitempty"     gorm:"not null"`
+	Type     int     `json:"type,omitempty"     gorm:"not null"`
+	Capacity int     `json:"capacity,omitempty" gorm:"capacity"`
+	Weight   float64 `json:"weight,omitempty"   gorm:"weight"`
 }
 
 // Item const..

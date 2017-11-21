@@ -8,12 +8,12 @@ import (
 Game game struct
 */
 type Game struct {
-	ID     int    `json:"id"`      // 游戏ID
-	UserID int    `json:"user_id"` // 用户ID
-	Name   string `json:"name"`    // 名称
-	BagID  int
-	MapID  int
-	Maps   []Map `gorm:"many2many:game_maps"`
+	ID     int    `json:"id,omitempty"`      // 游戏ID
+	UserID int    `json:"user_id,omitempty"` // 用户ID
+	Name   string `json:"name,omitempty"`    // 名称
+	BagID  int    `json:"bag_id,omitempty"`
+	MapID  int    `json:"map_id,omitempty"`
+	Maps   []Map  `json:"maps,omitempty" gorm:"many2many:game_maps"`
 }
 
 /*

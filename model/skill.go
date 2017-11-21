@@ -6,15 +6,15 @@ import (
 
 // Skill ...
 type Skill struct {
-	ID          int    `json:"id"`
-	CharactorID int    `json:"charactor_id"`
-	Name        string `json:"name"    gorm:"not null;unique"`
-	Type        int    `json:"type"    gorm:"not null"`
+	ID          int    `json:"id,omitempty"`
+	CharactorID int    `json:"charactor_id,omitempty"`
+	Name        string `json:"name,omitempty" gorm:"not null;unique"`
+	Type        int    `json:"type,omitempty" gorm:"not null"`
 
-	Level     int `json:"level"`
-	Exp       int
-	ExpLimit  int
-	Potential float64 `json:"potential"`
+	Level     int     `json:"level,omitempty"`
+	Exp       int     `json:"exp,omitempty"`
+	ExpLimit  int     `json:"exp_limit,omitempty"`
+	Potential float64 `json:"potential,omitempty"`
 }
 
 // Skill const

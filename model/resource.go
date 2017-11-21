@@ -9,15 +9,14 @@ import (
 
 // Resource ...
 type Resource struct {
-	ID    int `json:"id"`
-	MapID int `json:"map_id"`
-	Type  int `json:"type" gorm:"not null"`
-
-	Level         int `json:"level"`
-	Quantity      float64
-	QuantityLimit float64
-	RecoverySpeed float64   `json:"recovery_speed"` // per day
-	PreTime       time.Time `json:"pre_time" gorm:"not null"`
+	ID            int       `json:"id,omitempty"`
+	MapID         int       `json:"map_id,omitempty"`
+	Type          int       `json:"type,omitempty"            gorm:"not null"`
+	Level         int       `json:"level,omitempty"`
+	Quantity      float64   `json:"quantity,omitempty"`
+	QuantityLimit float64   `json:"quantity_limit,omitempty"`
+	RecoverySpeed float64   `json:"recovery_speed,omitempty"` // per day
+	PreTime       time.Time `json:"pre_time,omitempty"        gorm:"not null"`
 }
 
 /*

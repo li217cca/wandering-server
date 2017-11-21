@@ -14,6 +14,12 @@ var (
 	DB *gorm.DB
 )
 
+// salt
+const (
+	globalSalt   = "A23@#!N*s&!YND)_!@IMLadh19SADN@#*)&HSLsdD"
+	jwtSigninKey = "hgUUYSADoihhdIOXCYo8B@iudyUAIOCX"
+)
+
 func init() {
 	var err error
 	DB, err = gorm.Open("postgres",

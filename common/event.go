@@ -1,10 +1,12 @@
 package common
 
 const (
-	AUTH_LOGIN   = "AUTH_LOGIN"   // map[string]string{username, password}
-	AUTH_SIGNIN  = "AUTH_SIGNIN"  // map[string]string{username, password}
-	AUTH_ERROR   = "AUTH_ERROR"   // string
-	AUTH_SUCCESS = "AUTH_SUCCESS" // string
+	AUTH_LOGIN    = "AUTH_LOGIN"    // map[string]string{username, password}
+	AUTH_SIGNUP   = "AUTH_SIGNUP"   // map[string]string{username, password}
+	AUTH_BIND     = "AUTH_BIND"     // token string
+	AUTH_ERROR    = "AUTH_ERROR"    // string
+	AUTH_SUCCESS  = "AUTH_SUCCESS"  // string
+	TOKEN_RECEIPT = "TOKEN_RECEIPT" // string
 
 	GAME_RECEIPT      = "GAME_RECEIPT"      // Game{}
 	GAME_RECEIPT_LIST = "GAME_RECEIPT_LIST" // []Game{}

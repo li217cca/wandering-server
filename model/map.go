@@ -5,15 +5,13 @@ import "math"
 
 // Map ...
 type Map struct {
-	ID  int    `json:"id"`
-	Key string `json:"key" gorm:"not null"`
-
-	Danger  int `json:"danger"`  // 危险等级
-	Miracle int `json:"miracle"` // 奇迹等级
-	// Weather  int `json:"weather"`
-	Resources []Resource
-	Routes    []Route `gorm:"ForeignKey:source_id"`
-	Quests    []Quest
+	ID        int        `json:"id,omitempty"`
+	Key       string     `json:"key,omitempty" gorm:"not null"`
+	Danger    int        `json:"danger,omitempty"`  // 危险等级
+	Miracle   int        `json:"miracle,omitempty"` // 奇迹等级
+	Resources []Resource `json:"resources,omitempty"`
+	Routes    []Route    `json:"routes,omitempty" gorm:"ForeignKey:source_id"`
+	Quests    []Quest    `json:"quests,omitempty"`
 }
 
 /*

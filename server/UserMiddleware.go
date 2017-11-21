@@ -44,6 +44,23 @@ func (ctx *userContext) sendGames() {
 	db.Model(&ctx.User).Related(&games)
 	ctx.Conn.Emit(common.GAME_RECEIPT_LIST, games)
 }
+func (ctx *userContext) sendToken() error {
+	token, err := model.NewUserToken(ctx.User, time.Now().Add(time.Second*300).Unix())
+	if err != nil {
+		return fmt.Errorf("\nuserContext.sendToken 01 \n%v", err)
+	}
+	return ctx.Conn.Emit(common.TOKEN_RECEIPT, token)
+}
+func (ctx *userContext) autoSendToken() {
+	ticker := time.NewTicker(time.Minute * 3)
+	for {
+		if err := ctx.sendToken(); err != nil {
+			ctx.Log("\nautoSendToken faild", err)
+			return
+		}
+		<-ticker.C
+	}
+}
 
 func handleUser(pctx *connContext, user model.User) error {
 	ctx, err := newUserContext(pctx, user)
@@ -52,6 +69,10 @@ func handleUser(pctx *connContext, user model.User) error {
 	}
 	ctx.Log("login")
 
+	// auto send token
+	go ctx.autoSendToken()
+
+	// send game list..
 	ctx.sendGames()
 
 	ctx.OnSelect(func(gameID int) {

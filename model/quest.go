@@ -4,12 +4,12 @@ package model
 Quest ...
 */
 type Quest struct {
-	ID     int
-	NextID int
-	MapID  int    `gorm:"not null"`
-	Name   string `gorm:"not null"`
-	Type   int    `gorm:"not null"`
-	Level  int    `gorm:"not null"`
+	ID     int    `json:"id,omitempty"`
+	NextID int    `json:"next_id,omitempty"`
+	MapID  int    `json:"map_id,omitempty"  gorm:"not null" `
+	Name   string `json:"name,omitempty"    gorm:"not null"`
+	Type   int    `json:"type,omitempty"    gorm:"not null"`
+	Level  int    `json:"level,omitempty"   gorm:"not null"`
 }
 
 /*
