@@ -5,6 +5,7 @@ Bag Bag's struct
 */
 type Bag struct {
 	ID            int     `json:"id,omitempty"`
+	UserID        int     `json:"user_id,omitempty"`
 	Capacity      int     `json:"capacity,omitempty"`
 	CapacityLimit int     `json:"capacity_limit,omitempty"`
 	Weight        float64 `json:"weight,omitempty"`

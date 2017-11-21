@@ -50,7 +50,6 @@ func HandleConnection(conn websocket.Connection) {
 	ctx.Log("connect")
 
 	ctx.OnBind(func(token string) {
-		ctx.Log("Bind token=\"" + token + "\"")
 		userID, err := model.ParseUserToken(token)
 		if err != nil {
 			ctx.EmitError("Token 无效")

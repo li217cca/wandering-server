@@ -12,7 +12,7 @@ var (
 func GetRand() *rand.Rand {
 	if ran == nil {
 		ran = rand.New(rand.NewSource(time.Now().UnixNano()))
-		fmt.Println("GetRand new ran %v", ran)
+		// fmt.Println("GetRand new ran %v", ran)
 	}
 	return ran
 }

@@ -56,7 +56,7 @@ func handleGame(pctx *userContext, game model.Game) error {
 	if err != nil {
 		return fmt.Errorf("\nhandleGame 01 %v", err)
 	}
-	ctx.Log("Game conn..")
+	ctx.Log("Game conn")
 
 	// send Game{}
 	ctx.Emit(common.GAME_RECEIPT, game)

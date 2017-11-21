@@ -12,6 +12,7 @@ type Map struct {
 	Resources []Resource `json:"resources,omitempty"`
 	Routes    []Route    `json:"routes,omitempty" gorm:"ForeignKey:source_id"`
 	Quests    []Quest    `json:"quests,omitempty"`
+	// Games     []Game     `json:"games,omitempty" gorm:"many2many:game_maps"`
 }
 
 /*

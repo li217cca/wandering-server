@@ -8,12 +8,12 @@ import (
 Game game struct
 */
 type Game struct {
-	ID     int    `json:"id,omitempty"`      // 游戏ID
-	UserID int    `json:"user_id,omitempty"` // 用户ID
-	Name   string `json:"name,omitempty"`    // 名称
-	BagID  int    `json:"bag_id,omitempty"`
-	MapID  int    `json:"map_id,omitempty"`
-	Maps   []Map  `json:"maps,omitempty" gorm:"many2many:game_maps"`
+	ID       int    `json:"id,omitempty"`      // 游戏ID
+	UserID   int    `json:"user_id,omitempty"` // 用户ID
+	Name     string `json:"name,omitempty"`    // 名称
+	BagID    int    `json:"bag_id,omitempty"`
+	NowMapID int    `json:"map_id,omitempty"`
+	Maps     []Map  `json:"maps,omitempty" gorm:"many2many:game_maps"`
 }
 
 /*
@@ -41,11 +41,11 @@ func NewNativeGame(UserID int, Name string) (game Game, err error) {
 
 	// init game
 	game = Game{
-		UserID: UserID,
-		Name:   Name,
-		BagID:  bag.ID,
-		MapID:  mp.ID,
-		Maps:   []Map{mp},
+		UserID:   UserID,
+		Name:     Name,
+		BagID:    bag.ID,
+		NowMapID: mp.ID,
+		Maps:     []Map{mp},
 	}
 	DB.Save(&game)
 

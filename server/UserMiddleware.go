@@ -30,9 +30,6 @@ func newUserContext(ctx *connContext, user model.User) (userContext, error) {
 	}, nil
 }
 
-func (ctx *userContext) EmitError(msg string) {
-	ctx.Conn.Emit(common.GAME_ERROR, msg)
-}
 func (ctx *userContext) OnSelect(messageFunc websocket.MessageFunc) {
 	ctx.Conn.On(common.GAME_SELECT, messageFunc)
 }
@@ -81,6 +78,7 @@ func handleUser(pctx *connContext, user model.User) error {
 		if err := db.Model(model.Game{}).Where("id = ?", gameID).Find(&game).Error; err != nil {
 			ctx.Log(fmt.Errorf("\nhandleUser ctx.OnSelect 01 \n%v", err))
 		}
+		db.Model(&game).Related(&game.Maps, "Maps")
 		if err := handleGame(&ctx, game); err != nil {
 			ctx.Log(fmt.Errorf("\nhandleUser ctx.OnSelect 02 \n%v", err))
 		}
