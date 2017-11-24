@@ -9,9 +9,9 @@ type Item struct {
 	ID       int     `json:"id,omitempty"       gorm:"primary_key"`
 	BagID    int     `json:"bag_id,omitempty"`
 	Name     string  `json:"name,omitempty"     gorm:"not null"`
-	Type     int     `json:"type,omitempty"     gorm:"not null"`
-	Capacity int     `json:"capacity,omitempty" gorm:"capacity"`
-	Weight   float64 `json:"weight,omitempty"   gorm:"weight"`
+	ItemType int     ` gorm:"not null"`
+	Capacity int     `json:"capacity,omitempty" gorm:"capacity;not null"`
+	Weight   float64 `json:"weight,omitempty"   gorm:"weight;not null"`
 }
 
 // Item const..

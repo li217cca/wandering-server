@@ -5,6 +5,7 @@ type Route struct {
 	ID       int `json:"id,omitempty"`
 	SourceID int `json:"source_id,omitempty"`
 	TargetID int `json:"target_id,omitempty"`
+	Strength int `json:"strength,omitempty"` // 强度
 }
 
 /*

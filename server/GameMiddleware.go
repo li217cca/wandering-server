@@ -59,11 +59,14 @@ func handleGame(pctx *userContext, game model.Game) error {
 	ctx.Log("Game conn")
 
 	// send Game{}
-	ctx.Emit(common.GAME_RECEIPT, game)
+	ctx.Emit(common.GAME_RECEIPT, ctx.Game.Info)
+	ctx.Emit(common.MAP_RECEIPT, ctx.Game.Map)
+	ctx.Emit(common.BAG_RECEIPT, ctx.Game.Bag)
 
 	// map search api
 	ctx.On(common.MAP_SEARCH, func() {
-		// TODO: map search
+		ctx.Game.Map.Search(ctx.Game.Lucky)
+		ctx.Emit(common.MAP_RECEIPT, ctx.Game.Map)
 	})
 	// TODO: 交互游戏信息
 	return nil
