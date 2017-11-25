@@ -46,7 +46,7 @@ func (mp *Map) getName(miracle float64, danger float64) {
 }
 
 // Search []
-func (mp *Map) Search(lucky int) {
+func (mp *Map) Search(lucky float64) {
 	// TODO: Search.. generate quest
 	times := common.Float(3, 6)
 	for i := 0; i < times; i++ {

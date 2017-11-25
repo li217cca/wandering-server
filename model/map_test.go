@@ -6,8 +6,8 @@ import (
 
 func TestNewMap(t *testing.T) {
 	type args struct {
-		lucky     int
-		bfoDanger int
+		lucky     float64
+		bfoDanger float64
 	}
 	tests := []struct {
 		name string
@@ -17,7 +17,7 @@ func TestNewMap(t *testing.T) {
 			"1",
 			args{
 				lucky:     100,
-				bfoDanger: 1,
+				bfoDanger: 10,
 			},
 		},
 	}

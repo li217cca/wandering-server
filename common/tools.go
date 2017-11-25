@@ -114,6 +114,12 @@ func GetTodayLucky() int {
 	return ans
 }
 
+// RouletteNode ...
+type RouletteNode struct {
+	Weight int
+	Target interface{}
+}
+
 // Roulette ...
 type Roulette []struct {
 	Weight int

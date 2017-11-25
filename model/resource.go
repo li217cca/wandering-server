@@ -239,7 +239,7 @@ func NewResource(lucky float64, miracle float64, danger float64) Resource {
 		preDay = 360000
 	}
 	preDay = 0
-	res.Evolved(preDay)
+	res.Evolved(int(preDay))
 	return res
 }
 

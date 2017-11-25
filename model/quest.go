@@ -1,6 +1,7 @@
 package model
 
 import (
+	"math"
 	"wandering-server/common"
 )
 
@@ -20,6 +21,24 @@ type Quest struct {
 	Difficulty int `gorm:"not null"` // 普通/精英/BOSS
 
 	Destiny int `json:"destiny,omitempty"` // 命运
+}
+
+func (quest *Quest) Size() int {
+	switch quest.QuestType {
+	case QuestBattleID:
+		return 2
+	case QuestRaidID:
+		return 6
+	case QuestMixedRaidID:
+		return 8
+	case QuestDungeonID:
+		return 23
+	case QuestMixedDungeonID:
+		return 25
+	case QuestChaosDungeonID:
+		return 15
+	}
+	return 0
 }
 
 // Quest const ...
@@ -57,53 +76,106 @@ func (quest *Quest) DestinyResult() {
 	// TODO:
 }
 
+func randomQuestType() int {
+	rou := common.Roulette{
+		{1, QuestBattleID},
+		{1, QuestRaidID},
+		{1, QuestMixedRaidID},
+		{1, QuestDungeonID},
+		{1, QuestMixedDungeonID},
+		{1, QuestChaosDungeonID},
+		{0, QuestAncientDungeonID},
+	}
+	return rou.Get().(int)
+}
+
+func (quest *Quest) isMixed() bool {
+	switch quest.QuestType {
+	case QuestMixedRaidID:
+		return true
+	case QuestMixedDungeonID:
+		return true
+	case QuestChaosDungeonID:
+		return true
+	}
+	return false
+}
+
+func (quest *Quest) randomNextEnemyType(res *Resource) int {
+	notMix := 100.
+	if !quest.isMixed() {
+		notMix = 1000
+	}
+	notMix *= math.Sqrt(res.Area() / 2000)
+	if quest.EnemyType == 0 {
+		notMix = 0
+	}
+	rou := common.Roulette{
+		{int(notMix), quest.EnemyType},
+		{int(100 * math.Sqrt(res.PlantResource/10000)), EnemyPlantID},
+		{int(100 * math.Sqrt(res.PhytozoonResource/1000)), EnemyPhytozoonID},
+		{int(100 * math.Sqrt(res.CarnivoreResource/200)), EnemyCarnivoreID},
+		{int(100 * math.Sqrt(res.CivilizationResource/200)), EnemyCivilizationID},
+		{int(100 * math.Sqrt(res.CivilizationResource/1000)), EnemyCivilizationExileID},
+		{int(100 * math.Sqrt(res.LegendResource/1000)), EnemyLegengID},
+	}
+	return rou.Get().(int)
+}
+
+// randomNextThemeType [pure]
+func (quest *Quest) randomNextThemeType(res *Resource) int {
+	notMix := 100.
+	if !quest.isMixed() {
+		notMix = 1000
+	}
+	notMix *= math.Sqrt(res.Area() / 1000)
+	if quest.ThemeType == 0 {
+		notMix = 0
+	}
+	rou := common.Roulette{
+		{int(notMix), quest.ThemeType},
+		{int(100 * math.Sqrt(res.Area()/1000)), EnemyThemeNormalID},
+		{int(100 * math.Sqrt(res.MagicResource/1000)), EnemyThemeMagicID},
+		{int(100 * math.Sqrt(res.ScienceResource/1000)), EnemyThemeScienceID},
+		{int(100 * math.Sqrt(res.MagicResource/500) * math.Sqrt(res.ScienceResource/500)), EnemyThemePunkID},
+		{int(100 * math.Sqrt(res.DisasterResource/1000)), EnemyThemeDisasterID},
+	}
+	return rou.Get().(int)
+}
+
+// randomNextDifficulty [pure]
+func (quest *Quest) randomNextDifficulty(lucky float64) int {
+	destinyAddition := math.Sqrt(float64(quest.Destiny / 1000))
+	luckyAddition := math.Sqrt(lucky / 50)
+	sizeAddition := math.Sqrt(float64(quest.Size()) / 10)
+	rou := common.Roulette{
+		{int(100), EnemyDifficultyNormalID},
+		{int(5 + 50*destinyAddition), EnemyDifficultyEliteID},
+		{int(50 * destinyAddition * sizeAddition), EnemyDifficultyBossID},
+		{int(5 + 50*destinyAddition*luckyAddition), EnemyDifficultyPrizeID},
+		{int(50 * luckyAddition * sizeAddition), EnemyDifficultyFriendID},
+	}
+	return rou.Get().(int)
+}
+
 // GenerateNextQuest [pure]
-func (pre *Quest) GenerateNextQuest(lucky float64) Quest {
+func (mp *Map) GenerateNextQuest(lucky float64, destinyDiff int, pre *Quest) Quest {
 	quest := Quest{
 		PreID:      pre.ID,
 		Danger:     common.FloatF(pre.Danger-1, pre.Danger+2),
-		QuestType:  0,                                 // TODO
-		EnemyType:  0,                                 // TODO
-		ThemeType:  0,                                 // TODO
-		Difficulty: 0,                                 // TODO
-		Destiny:    pre.Destiny + pre.DestinyResult(), // TODO
+		QuestType:  pre.QuestType,                         // TODO
+		EnemyType:  pre.randomNextEnemyType(&mp.Resource), // TODO
+		ThemeType:  pre.randomNextThemeType(&mp.Resource), // TODO
+		Difficulty: pre.randomNextDifficulty(lucky),       // TODO
+		Destiny:    pre.Destiny + destinyDiff,             // TODO
 	}
 	return quest
 }
 
-// GenerateNextQuest [pure]
-func (mp *Map) GenerateNextQuest(lucky float64, pre Quest) {
-	rou := common.Roulette{
-		{
-			Weight: 100,
-			Target: QuestNormalBattleID,
-		},
-		{
-			Weight: 3 * pre.Deep,
-			Target: QuestNormalBattleID,
-		},
-		{
-			Weight: common.Sqrt(lucky),
-			Target: QuestNormalTreasureID,
-		},
-	}
-	quest := Quest{
-		PreID: pre.ID,
-		Name:  common.GenerateKey(8), // TODO: 生成名称
-		Type:  rou.Get().(int),
-		Level: common.Float(pre.Level-2, pre.Level+4),
-		Deep:  pre.Deep + 1,
-	}
-	mp.Quests = append(mp.Quests, quest)
-}
-
-/*
-Map.generateQuest [pure] Generate quest from lucky, danger, miracle ...
-*/
-func (mp *Map) GenerateQuest(lucky int) {
-	mp.GenerateNextQuest(lucky, Quest{
-		ID:    0,
-		Level: mp.Resource.Danger,
-		Deep:  0,
+// GenerateQuest [pure]
+func (mp *Map) GenerateQuest(lucky float64) {
+	mp.GenerateNextQuest(lucky, 0, &Quest{
+		Danger:    mp.Resource.Danger,
+		QuestType: randomQuestType(),
 	})
 }

@@ -6,9 +6,9 @@ import (
 
 func TestNewResource(t *testing.T) {
 	type args struct {
-		lucky   int
-		miracle int
-		danger  int
+		lucky   float64
+		miracle float64
+		danger  float64
 	}
 	tests := []struct {
 		name string

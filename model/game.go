@@ -23,7 +23,7 @@ UnitTest: false
 */
 func NewNativeGame(UserID int, Name string) (game Game, err error) {
 	// init map
-	mp := NewMap(common.NewGameGiftLucky+common.GetTodayLucky(), 0)
+	mp := NewMap(float64(common.NewGameGiftLucky+common.GetTodayLucky()), 0.)
 	DB.Save(&mp)
 
 	// init skill
