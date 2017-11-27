@@ -22,9 +22,6 @@ Type: not pure
 UnitTest: false
 */
 func NewNativeGame(UserID int, Name string) (game Game, err error) {
-	// init map
-	mp := NewMap(float64(common.NewGameGiftLucky+common.GetTodayLucky()), 0.)
-	DB.Save(&mp)
 
 	// init skill
 	skills := []Skill{
@@ -41,12 +38,18 @@ func NewNativeGame(UserID int, Name string) (game Game, err error) {
 
 	// init game
 	game = Game{
-		UserID:   UserID,
-		Name:     Name,
-		BagID:    bag.ID,
-		NowMapID: mp.ID,
-		Maps:     []Map{mp},
+		UserID: UserID,
+		Name:   Name,
+		BagID:  bag.ID,
 	}
+	DB.Save(&game)
+
+	// init map
+	mp := NewMap(float64(common.NewGameGiftLucky+common.GetTodayLucky(game.ID)), 0)
+
+	// assign map to game
+	game.NowMapID = mp.ID
+	game.Maps = []Map{mp}
 	DB.Save(&game)
 
 	// init char

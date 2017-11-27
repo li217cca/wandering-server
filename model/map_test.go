@@ -1,7 +1,9 @@
 package model
 
 import (
+	"fmt"
 	"testing"
+	"wandering-server/common"
 )
 
 func TestNewMap(t *testing.T) {
@@ -16,7 +18,7 @@ func TestNewMap(t *testing.T) {
 		{
 			"1",
 			args{
-				lucky:     100,
+				lucky:     50,
 				bfoDanger: 10,
 			},
 		},
@@ -33,6 +35,29 @@ func TestNewMap(t *testing.T) {
 			t.Error("\n一天", got.ToString())
 			got.Resource.Evolved(43200)
 			t.Error("\n一个月", got.ToString())
+			str := ``
+			for i := 0; i < 10; i++ {
+				lucky := common.FloatF(10, 130)
+				pre := got.GenerateQuest(lucky)
+				Length := pre.Length
+				pre.ID = 1
+				str += pre.ToString()
+				got.Quests = append(got.Quests, pre)
+				for j := 0; j < Length; j++ {
+					getDistiny := pre.GetDistiny()
+					useDistiny := pre.UseDistiny(getDistiny)
+					destinyDiff := getDistiny - useDistiny
+					if pre.IsEnd(destinyDiff) {
+						str += fmt.Sprintf("\n		[%d%d = %d]: End\n", pre.Destiny, destinyDiff, pre.Destiny+destinyDiff)
+						break
+					}
+					pre = got.GenerateNextQuest(lucky, destinyDiff, &pre)
+					pre.ID = j + 2
+					str += pre.ToString()
+					got.Quests = append(got.Quests, pre)
+				}
+			}
+			t.Errorf("Quests: \n%s", str)
 		})
 	}
 }

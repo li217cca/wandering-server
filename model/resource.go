@@ -210,6 +210,12 @@ func (res *Resource) Evolved(day int) {
 
 // NewResource [pure test]
 func NewResource(lucky float64, miracle float64, danger float64) Resource {
+	if danger < 1 {
+		danger = 1
+	}
+	if miracle < 1 {
+		miracle = 1
+	}
 	res := Resource{
 		Danger:  danger,
 		Miracle: miracle,

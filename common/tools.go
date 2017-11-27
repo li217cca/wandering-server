@@ -68,20 +68,20 @@ func FloatPercentF(value float64, percent float64) float64 {
 	return res
 }
 
-// GaussianlRandF10  高斯分布
-func GaussianlRandF10(mean float64, diff float64) float64 {
+// GaussianlRandF3  高斯分布
+func GaussianlRandF3(mean float64, diff float64) float64 {
 	res := 0.
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 3; i++ {
 		res += FloatF(mean-diff, mean+diff)
 	}
-	return res / 10.
+	return res / 3.
 }
 
 // BinomialRandF10  二项分布
-func BinomialRandF10(mean float64, max float64) float64 {
+func _BinomialRandF10(mean float64, max float64) float64 {
 	res := 0.
 	chance := 1 - mean/max
-	for i := 0; i < 9; i++ {
+	for i := 0; i < 99; i++ {
 		tmp := FloatF(0, max*0.3)
 		max -= tmp
 		if ran.Float64() >= chance {
@@ -104,14 +104,13 @@ func GenerateKey(len int) string {
 	return string(str)
 }
 
-// GetTodayLucky ...
-func GetTodayLucky() int {
-	r := GetRand()
-	ans := 0
-	for i := 0; i < 10; i++ { // normal day lucky = [0, 100]
-		ans += r.Intn(10)
-	}
-	return ans
+// GetTodayLucky [not pure]
+func GetTodayLucky(ID int) float64 {
+	t := time.Now()
+	day := int64(t.Year() * t.YearDay())
+	r := rand.New(rand.NewSource(int64(ID) * day))
+
+	return float64(r.Int31()%34 + r.Int31()%34 + r.Int31()%35)
 }
 
 // RouletteNode ...
@@ -134,6 +133,9 @@ func (rou *Roulette) Get() interface{} {
 		Target    *interface{}
 	}
 	for index := range *rou {
+		if (*rou)[index].Weight < 1 {
+			continue
+		}
 		totWeight += (*rou)[index].Weight
 		tmp = append(tmp, struct {
 			WeightPos int
@@ -144,12 +146,15 @@ func (rou *Roulette) Get() interface{} {
 		})
 	}
 	r := GetRand()
-	dice := r.Int() % totWeight
+	dice := 0
+	if totWeight != 0 {
+		dice = r.Int() % totWeight
+	}
 	for index := range tmp {
 		if tmp[index].WeightPos >= dice {
 			return *(tmp[index].Target)
 		}
 	}
 	fmt.Printf("Roulette.get error %v", rou)
-	return nil
+	return (*rou)[0].Target
 }

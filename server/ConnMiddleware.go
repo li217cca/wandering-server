@@ -47,7 +47,7 @@ func (ctx *connContext) OnBind(messageFunc websocket.MessageFunc) {
 // HandleConnection ...
 func HandleConnection(conn websocket.Connection) {
 	ctx := newConnContext(conn)
-	ctx.Log("connect")
+	ctx.Log("Connect")
 
 	ctx.OnBind(func(token string) {
 		userID, err := model.ParseUserToken(token)
@@ -116,6 +116,6 @@ func HandleConnection(conn websocket.Connection) {
 	})
 
 	ctx.Conn.OnDisconnect(func() {
-		ctx.Log("disconnect")
+		ctx.Log("Disconnect")
 	})
 }

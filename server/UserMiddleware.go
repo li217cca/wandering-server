@@ -19,7 +19,7 @@ type userContext struct {
 // 新建用户内容实体
 func newUserContext(ctx *connContext, user model.User) (userContext, error) {
 	logger := func(args ...interface{}) {
-		fmt.Printf("(%s) [%s] %s: ", ctx.Conn.Context().RemoteAddr(), time.Now().Format("01/02 15:04:05.00"), user.Username)
+		fmt.Printf("(%s) [%s]: %s: ", ctx.Conn.Context().RemoteAddr(), time.Now().Format("01/02 15:04:05.00"), user.Username)
 		fmt.Println(args...)
 	}
 	return userContext{
@@ -64,7 +64,7 @@ func handleUser(pctx *connContext, user model.User) error {
 	if err != nil {
 		return fmt.Errorf("\nhandleUser 01 %v", err)
 	}
-	ctx.Log("login")
+	ctx.Log("Login")
 
 	// auto send token
 	go ctx.autoSendToken()
@@ -73,7 +73,7 @@ func handleUser(pctx *connContext, user model.User) error {
 	ctx.sendGames()
 
 	ctx.OnSelect(func(gameID int) {
-		ctx.Log("handUser OnSelect gameID=", gameID)
+		// ctx.Log("handUser OnSelect gameID=", gameID)
 		game := model.Game{}
 		if err := db.Model(model.Game{}).Where("id = ?", gameID).Find(&game).Error; err != nil {
 			ctx.Log(fmt.Errorf("\nhandleUser ctx.OnSelect 01 \n%v", err))
@@ -84,7 +84,7 @@ func handleUser(pctx *connContext, user model.User) error {
 		}
 	})
 	ctx.OnCreate(func(name string) {
-		ctx.Log("handUser OnCreate name=", name)
+		ctx.Log("OnCreateUser name=", name)
 		game, err := model.NewNativeGame(ctx.User.ID, name)
 		if err != nil {
 			ctx.Log(fmt.Errorf("\nhandleUser ctx.OnCreate 01 %v", err))

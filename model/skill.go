@@ -8,7 +8,7 @@ import (
 type Skill struct {
 	ID          int    `json:"id,omitempty"`
 	CharactorID int    `json:"charactor_id,omitempty"`
-	Name        string `json:"name,omitempty" gorm:"not null;unique"`
+	Name        string `json:"name,omitempty" gorm:"not null;"`
 	Type        int    `json:"type,omitempty" gorm:"not null"`
 
 	Level     int     `json:"level,omitempty"`

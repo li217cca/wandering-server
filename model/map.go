@@ -57,8 +57,12 @@ func (mp *Map) Search(lucky float64) {
 // ToString [pure]
 func (mp *Map) ToString() string {
 	str := fmt.Sprintf(`
-	Map{ID: %d, Key: "%s", Name: "%s"}%s`,
+	Map{ID: %d, Key: "%s", Name: "%s"}%s
+	Quests:`,
 		mp.ID, mp.Key, mp.Name, mp.Resource.ToString(),
 	)
+	for index := range mp.Quests {
+		str += mp.Quests[index].ToString()
+	}
 	return str
 }

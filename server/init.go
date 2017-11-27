@@ -1,16 +1,17 @@
 package server
 
 import (
+	"time"
+	"wandering-server/common"
+
 	"github.com/jinzhu/gorm"
-	
+
 	"wandering-server/model"
-	
 )
 
 var (
-	db        *gorm.DB
-	// beginYear model.History
-	// nowTime   *model.Time
+	db             *gorm.DB
+	gameContainers = map[int]*gameContainer{}
 )
 
 // func getTime() *model.Time {
@@ -34,6 +35,15 @@ var (
 
 func init() {
 	db = model.DB
+	go func() {
+		ticker := time.NewTicker(time.Second * 5)
+		for {
+			<-ticker.C
+			for _, ptr := range gameContainers {
+				ptr.Lucky = common.GetTodayLucky(ptr.Info.ID)
+			}
+		}
+	}()
 	// if db.Model(model.History{}).Where(model.History{Name: "BEGIN_YEAR"}).Find(&beginYear).RecordNotFound() {
 	// 	beginYear = model.History{
 	// 		Name: "BEGIN_YEAR",

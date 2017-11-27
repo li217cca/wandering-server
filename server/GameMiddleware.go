@@ -20,15 +20,25 @@ type gameContainer struct {
 	Info  model.Game
 	Bag   model.Bag
 	Map   model.Map
-	Lucky int
+	Lucky float64
 }
 
 // 新建游戏内容实体
 func newGameContext(ctx *userContext, game model.Game) (gCtx gameContext, err error) {
 	var bag model.Bag
-	var mp model.Map
-	db.Model(&game).Related(&bag)
-	db.Model(&game).Related(&mp)
+	mp := model.Map{}
+	// db.Model(&game).Related(&bag)
+	for index := range game.Maps {
+		if game.NowMapID == game.Maps[index].ID {
+			mp = game.Maps[index]
+		}
+	}
+	if mp.ID == 0 {
+		mp = game.Maps[0]
+		game.NowMapID = mp.ID
+		db.Save(&game)
+	}
+
 	gCtx = gameContext{
 		Conn: ctx.Conn,
 		User: ctx.User,
@@ -44,7 +54,7 @@ func newGameContext(ctx *userContext, game model.Game) (gCtx gameContext, err er
 			Info:  game,
 			Bag:   bag,
 			Map:   mp,
-			Lucky: common.GetTodayLucky(), // FIXME: different lucky value in same day
+			Lucky: common.GetTodayLucky(game.ID), // FIXME: different lucky value in same day
 		},
 	}
 
@@ -56,8 +66,9 @@ func handleGame(pctx *userContext, game model.Game) error {
 	if err != nil {
 		return fmt.Errorf("\nhandleGame 01 %v", err)
 	}
-	ctx.Log("Game conn")
+	ctx.Log("Join Game")
 
+	gameContainers[ctx.Game.Info.ID] = &ctx.Game
 	// send Game{}
 	ctx.Emit(common.GAME_RECEIPT, ctx.Game.Info)
 	ctx.Emit(common.MAP_RECEIPT, ctx.Game.Map)
@@ -69,5 +80,9 @@ func handleGame(pctx *userContext, game model.Game) error {
 		ctx.Emit(common.MAP_RECEIPT, ctx.Game.Map)
 	})
 	// TODO: 交互游戏信息
+	ctx.Conn.OnDisconnect(func() {
+		ctx.Log("Leave Game")
+		delete(gameContainers, ctx.Game.Info.ID)
+	})
 	return nil
 }
