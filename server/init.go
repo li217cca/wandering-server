@@ -1,6 +1,7 @@
 package server
 
 import (
+	"sync"
 	"time"
 	"wandering-server/common"
 
@@ -9,9 +10,14 @@ import (
 	"wandering-server/model"
 )
 
+type gameContainersMap struct {
+	sync.RWMutex
+	m map[int]*gameContainer
+}
+
 var (
 	db             *gorm.DB
-	gameContainers = map[int]*gameContainer{}
+	gameContainers = gameContainersMap{}
 )
 
 // func getTime() *model.Time {
@@ -39,9 +45,11 @@ func init() {
 		ticker := time.NewTicker(time.Second * 5)
 		for {
 			<-ticker.C
-			for _, ptr := range gameContainers {
+			gameContainers.RLock()
+			for _, ptr := range gameContainers.m {
 				ptr.Lucky = common.GetTodayLucky(ptr.Info.ID)
 			}
+			gameContainers.RUnlock()
 		}
 	}()
 	// if db.Model(model.History{}).Where(model.History{Name: "BEGIN_YEAR"}).Find(&beginYear).RecordNotFound() {

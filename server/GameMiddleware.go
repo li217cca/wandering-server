@@ -68,7 +68,9 @@ func handleGame(pctx *userContext, game model.Game) error {
 	}
 	ctx.Log("Join Game")
 
-	gameContainers[ctx.Game.Info.ID] = &ctx.Game
+	gameContainers.RLock()
+	gameContainers.m[ctx.Game.Info.ID] = &ctx.Game
+	gameContainers.RUnlock()
 	// send Game{}
 	ctx.Emit(common.GAME_RECEIPT, ctx.Game.Info)
 	ctx.Emit(common.MAP_RECEIPT, ctx.Game.Map)
@@ -82,7 +84,9 @@ func handleGame(pctx *userContext, game model.Game) error {
 	// TODO: 交互游戏信息
 	ctx.Conn.OnDisconnect(func() {
 		ctx.Log("Leave Game")
-		delete(gameContainers, ctx.Game.Info.ID)
+		gameContainers.RLock()
+		delete(gameContainers.m, ctx.Game.Info.ID)
+		gameContainers.RUnlock()
 	})
 	return nil
 }
