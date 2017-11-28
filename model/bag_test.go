@@ -22,9 +22,9 @@ func TestBag_calcCapacityWeight(t *testing.T) {
 			},
 			args: args{
 				skills: []Skill{
-					Skill{Type: SkillBagCapacityID, Level: 3},
-					Skill{Type: SkillBagCapacityID, Level: 9},
-					Skill{Type: SkillBagWeightID, Level: 5},
+					Skill{Type: SkillBagCapacityBaseID, Level: 3},
+					Skill{Type: SkillBagCapacityBaseID, Level: 9},
+					Skill{Type: SkillBagWeightBaseID, Level: 5},
 				},
 			},
 			wantBag: &Bag{

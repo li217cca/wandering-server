@@ -8,7 +8,7 @@ import "math"
 // Map ...
 type Map struct {
 	ID       int       `json:"id,omitempty"`
-	Key      string    `json:"key,omitempty" gorm:"not null"`
+	Key      string    `json:"key,omitempty" gorm:"not null;unique"`
 	Name     string    `json:"name,omitempty" gorm:"not null"`
 	Resource Resource  `json:"resources,omitempty"`
 	Routes   []Route   `json:"routes,omitempty" gorm:"ForeignKey:source_id"`
@@ -46,12 +46,14 @@ func (mp *Map) getName(miracle float64, danger float64) {
 }
 
 // Search []
-func (mp *Map) Search(lucky float64) {
-	// TODO: Search.. generate quest
+func (mp *Map) Search(lucky float64) []Quest {
+
+	quests := []Quest{}
 	times := common.Float(3, 6)
 	for i := 0; i < times; i++ {
-		mp.GenerateQuest(lucky)
+		quests = append(quests, mp.GenerateQuest(lucky))
 	}
+	return quests
 }
 
 // ToString [pure]

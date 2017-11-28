@@ -1,7 +1,6 @@
 package model
 
 import (
-	"reflect"
 	"testing"
 )
 
@@ -120,65 +119,6 @@ func Test_limitAddFloat64(t *testing.T) {
 			}
 			if gotDiff != tt.wantDiff {
 				t.Errorf("limitAddFloat64() = %v, want %v", gotDiff, tt.wantDiff)
-			}
-		})
-	}
-}
-
-func TestCharactor_refreshHitPoint(t *testing.T) {
-	type args struct {
-		Skills []Skill
-	}
-	tests := []struct {
-		name     string
-		char     *Charactor
-		args     args
-		wantChar *Charactor
-	}{
-		{
-			name: "1",
-			char: &Charactor{
-				HitPoint:      50,
-				HitPointLimit: 100,
-			},
-			args: args{
-				Skills: []Skill{
-					Skill{
-						Type:  SkillHitPointID,
-						Level: 10,
-					},
-				},
-			},
-			wantChar: &Charactor{
-				HitPoint:      55,
-				HitPointLimit: 110,
-			},
-		},
-		{
-			name: "2",
-			char: &Charactor{
-				HitPoint:      10,
-				HitPointLimit: 100,
-			},
-			args: args{
-				Skills: []Skill{
-					Skill{
-						Type:  SkillHitPointID,
-						Level: 0,
-					},
-				},
-			},
-			wantChar: &Charactor{
-				HitPoint:      1,
-				HitPointLimit: 10,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.char.refreshHitPoint(tt.args.Skills)
-			if !reflect.DeepEqual(tt.char, tt.wantChar) {
-				t.Errorf("Bag.refreshHitPoint(%v) = %v, want %v", tt.args, tt.char, tt.wantChar)
 			}
 		})
 	}

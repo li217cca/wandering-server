@@ -33,16 +33,13 @@ Type: pure
 UnitTest: true
 */
 func (bag *Bag) calcCapacityWeight(skills []Skill) {
-	bag.CapacityLimit = 0
-	bag.WeightLimit = 0
-	for index := range skills {
-		bag.CapacityLimit += skills[index].preCalcBagCapacity()
-		bag.WeightLimit += skills[index].preCalcBagWeight()
-	}
+	ss := SkillSet(skills)
+	bag.CapacityLimit = ss.preCalcInt((*Skill).preCalcBagCapacityBase)
+	bag.WeightLimit = ss.preCalcFloat64((*Skill).preCalcBagWeightBase)
 }
 
 /*
-NewBag New a Bag{} & commit to Database
+NewBag New a Bag{}
 Type: pure
 UnitTest: false
 */

@@ -11,6 +11,7 @@ Quest ...
 */
 type Quest struct {
 	ID     int     `json:"id,omitempty"`
+	Key    string  `json:"key,omitempty" gorm:"-"`
 	PreID  int     `json:"pre_id,omitempty"` // 上一个ID
 	MapID  int     `json:"map_id,omitempty" gorm:"not null"`
 	Danger float64 `json:"danger,omitempty" gorm:"not null"`
@@ -25,8 +26,8 @@ type Quest struct {
 	Length  int `json:"length,omitempty"`
 }
 
-// Size [pure]
-func (quest *Quest) Size() int {
+// AboutSize [pure]
+func (quest *Quest) AboutSize() int {
 	switch quest.QuestType {
 	case QuestBattleID:
 		return 2
@@ -174,7 +175,7 @@ func (quest *Quest) randomNextThemeType(res *Resource) int {
 func (quest *Quest) randomNextDifficulty(lucky float64) int {
 	destinyAddition := math.Sqrt(float64(quest.Destiny / 600))
 	luckyAddition := math.Sqrt(lucky / 50)
-	sizeAddition := math.Sqrt(float64(quest.Size()) / 7)
+	sizeAddition := math.Sqrt(float64(quest.AboutSize()) / 7)
 	lengthAddition := 1 / math.Sqrt(float64(quest.Length+1))
 	rou := common.Roulette{
 		{int(100), EnemyDifficultyNormalID},
@@ -237,7 +238,7 @@ func (quest *Quest) UseDistiny(getDestiny int) int {
 
 // IsEnd [pure]
 func (quest *Quest) IsEnd(destinyDiff int) bool {
-	if quest.Size() > quest.Length*2 {
+	if quest.AboutSize() > quest.Length*2 {
 		if math.Sqrt(float64(quest.Destiny+destinyDiff)/100) < common.FloatF(0.5, 1.3) {
 			return true
 		}
@@ -248,7 +249,7 @@ func (quest *Quest) IsEnd(destinyDiff int) bool {
 // GenerateNextQuest [pure]
 func (mp *Map) GenerateNextQuest(lucky float64, destinyDiff int, pre *Quest) Quest {
 	quest := Quest{
-		MapID:      mp.ID,
+		Key:        common.GenerateKey(12),
 		PreID:      pre.ID,
 		Danger:     common.FloatF(pre.Danger-1, pre.Danger+2),
 		QuestType:  pre.QuestType,

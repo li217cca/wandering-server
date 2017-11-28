@@ -52,21 +52,18 @@ func limitAddFloat64(value *float64, limit *float64, inc float64) (diff int, err
 Charactor Charactor struct
 */
 type Charactor struct {
-	ID            int     `json:"id,omitempty"`
-	GameID        int     `json:"game_id,omitempty"`
-	Name          string  `json:"name,omitempty"    gorm:"not null"`
-	InTeam        int     `json:"in_team,omitempty" gorm:"not null"`
-	HitPoint      int     `json:"hit_point,omitempty"`
-	HitPointLimit int     `json:"hit_point_limit,omitempty"`
-	Skills        []Skill `json:"skills,omitempty"`
+	ID     int     `json:"id,omitempty"`
+	Name   string  `json:"name,omitempty"    gorm:"not null"`
+	Skills []Skill `json:"skills,omitempty"`
 }
 
 /*
 Char const
 */
 const (
-	CharIsInTeam  = 1
-	CharNotInTeam = -1
+	CharTypeAttackID      = 100
+	CharTypeSpeedAttackID = 101
+	CharTypeDefenceID     = 200
 )
 
 /*
@@ -74,28 +71,35 @@ Charactor.refreshHitPoint
 Type: pure
 UnitTest: true
 */
-func (char *Charactor) refreshHitPoint(Skills []Skill) {
-	tmpLimit := char.HitPointLimit
-	tmpValue := char.HitPoint
-	char.HitPointLimit = 10
-	for index := range Skills {
-		char.HitPointLimit += Skills[index].preCalcHitPoint()
-	}
-	char.HitPoint = tmpValue * char.HitPointLimit / tmpLimit
-}
+// func (char *Charactor) refreshHitPoint(Skills []Skill) {
+// 	tmpLimit := char.HitPointLimit
+// 	tmpValue := char.HitPoint
+// 	char.HitPointLimit = 10
+// 	for index := range Skills {
+// 		char.HitPointLimit += Skills[index].preCalcHitPoint()
+// 	}
+// 	char.HitPoint = tmpValue * char.HitPointLimit / tmpLimit
+// }
 
 /*
 NewCharactor New a Charactor{GameID, Inteam, Skills}
 Type: pure
 UnitTest: false
 */
-func NewCharactor(gameID int, name string, inTeam int) Charactor {
+func NewCharactor(name string, skills []Skill) Charactor {
 	char := Charactor{
-		GameID:        gameID,
-		Name:          name,
-		InTeam:        inTeam,
-		HitPoint:      10,
-		HitPointLimit: 10,
+		Name: name,
+		// HitPoint:      10,
+		// HitPointLimit: 10,
+		Skills: skills,
 	}
+	// char.refreshHitPoint(skills)
+	return char
+}
+
+// NewCharactorFromQuest [pure]
+func NewCharactorFromQuest(danger int, enemyType int, themeType int, difficulty int, charType int) Charactor {
+	char := Charactor{}
+	// TODO: finish it
 	return char
 }

@@ -17,10 +17,11 @@ type gameContext struct {
 	On   func(string, websocket.MessageFunc)
 }
 type gameContainer struct {
-	Info  model.Game
-	Bag   model.Bag
-	Map   model.Map
-	Lucky float64
+	Info   model.Game
+	Bag    model.Bag
+	Map    model.Map
+	Quests []model.Quest
+	Lucky  float64
 }
 
 // 新建游戏内容实体
@@ -78,8 +79,22 @@ func handleGame(pctx *userContext, game model.Game) error {
 
 	// map search api
 	ctx.On(common.MAP_SEARCH, func() {
-		ctx.Game.Map.Search(ctx.Game.Lucky)
-		ctx.Emit(common.MAP_RECEIPT, ctx.Game.Map)
+		quests := ctx.Game.Map.Search(ctx.Game.Lucky)
+		ctx.Game.Quests = append(ctx.Game.Quests, quests...)
+		ctx.Emit(common.QUESTS_RECEIPT, quests)
+	})
+	ctx.On(common.QUEST_MARK, func(key string) {
+		for index := range ctx.Game.Quests {
+			if ctx.Game.Quests[index].Key == key {
+				ctx.Game.Map.Quests = append(ctx.Game.Map.Quests, ctx.Game.Quests[index])
+				db.Save(&ctx.Game.Map)
+				ctx.Emit(common.QUESTS_RECEIPT, ctx.Game.Map.Quests)
+			}
+		}
+		ctx.Emit(common.GAME_ERROR, fmt.Sprintf("Quest Key 错误，Key=\"%s\"", key))
+	})
+	ctx.On(common.QUEST_HANDLE, func(QuestID int) {
+		// TODO: Handle quest
 	})
 	// TODO: 交互游戏信息
 	ctx.Conn.OnDisconnect(func() {

@@ -12,14 +12,19 @@ const (
 	GAME_SELECT = "GAME_SELECT" // int
 	GAME_ERROR  = "GAME_ERROR"  // string
 
-	GAME_RECEIPT         = "GAME_RECEIPT"         // Game{}
-	GAME_RECEIPT_LIST    = "GAME_RECEIPT_LIST"    // []Game{}
-	GAME_RECEIPT_MESSAGE = "GAME_RECEIPT_MESSAGE" // {type, string}
+	GAME_RECEIPT      = "GAME_RECEIPT"      // Game{}
+	GAME_RECEIPT_LIST = "GAME_RECEIPT_LIST" // []Game{}
+	// GAME_RECEIPT_MESSAGE = "GAME_RECEIPT_MESSAGE" // {type, string}
 
 	// Map
 	MAP_SEARCH  = "MAP_SEARCH"  // -
 	MAP_REQUEST = "MAP_REQUEST" // -
 	MAP_RECEIPT = "MAP_RECEIPT" // (Map{})
+
+	// Quest
+	QUESTS_RECEIPT = "QUESTS_RECEIPT"
+	QUEST_HANDLE   = "QUEST_HANDLE"
+	QUEST_MARK     = "QUEST_SAVE"
 
 	// Bag
 	BAG_RECEIPT = "BAG_RECEIPT" // (Bag{})
