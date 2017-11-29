@@ -22,8 +22,10 @@ type Quest struct {
 	ThemeType  int `gorm:"not null" json:"theme_type,omitempty"` // 普通/科学/魔法/朋克/灾祸...
 	Difficulty int `gorm:"not null" json:"difficulty,omitempty"` // 普通/精英/BOSS
 
-	Destiny int `json:"destiny,omitempty"` // 命运
-	Length  int `json:"length,omitempty"`
+	Destiny int   `json:"destiny,omitempty"` // 命运
+	Length  int   `json:"length,omitempty"`
+	PartyID int   `json:"party_id,omitempty"`
+	Party   Party `json:"party,omitempty" gorm:"-"`
 }
 
 // AboutSize [pure]
@@ -64,7 +66,7 @@ const (
 	EnemyCarnivoreID         = 300 // 肉食动物
 	EnemyCivilizationID      = 400 // 文明
 	EnemyCivilizationExileID = 410 // 放逐文明
-	EnemyLegengID            = 500 // 传说
+	EnemyLegendID            = 500 // 传说
 
 	QuestBattleID         = 200 // [1,   2] 一种种族，概率Prize
 	QuestRaidID           = 300 // [3,   9] 一种种族，概率Prize，概率BOSS
@@ -138,13 +140,14 @@ func (quest *Quest) randomNextEnemyType(res *Resource) int {
 	if quest.EnemyType == 0 {
 		notMix = 0
 	}
+	disasterAddition := math.Sqrt(res.DisasterResource / 100)
 	rou := common.Roulette{
-		{int(100 * math.Sqrt(res.PlantResource/10000)), EnemyPlantID},
+		{int(100 * math.Sqrt(res.PlantResource/10000*disasterAddition)), EnemyPlantID},
 		{int(100 * math.Sqrt(res.PhytozoonResource/1000)), EnemyPhytozoonID},
 		{int(100 * math.Sqrt(res.CarnivoreResource/200)), EnemyCarnivoreID},
 		{int(100 * math.Sqrt(res.CivilizationResource/200)), EnemyCivilizationID},
 		{int(100 * math.Sqrt(res.CivilizationResource/1000)), EnemyCivilizationExileID},
-		{int(100 * math.Sqrt(res.LegendResource/1000)), EnemyLegengID},
+		{int(100 * math.Sqrt(res.LegendResource/1000)), EnemyLegendID},
 		{int(notMix), quest.EnemyType},
 	}
 	return rou.Get().(int)
@@ -209,7 +212,7 @@ func (quest *Quest) GetDistiny() int {
 		destiny *= 5
 	}
 	switch quest.EnemyType {
-	case EnemyLegengID:
+	case EnemyLegendID:
 		destiny *= 2
 	case EnemyCivilizationExileID:
 		destiny *= 1.3
@@ -307,7 +310,7 @@ func (quest *Quest) EnemyTypeToString() string {
 		return "文明"
 	case EnemyCivilizationExileID:
 		return "放逐文明"
-	case EnemyLegengID:
+	case EnemyLegendID:
 		return "传说"
 	}
 	return "未知种族"
@@ -363,8 +366,9 @@ func (quest *Quest) ToString() string {
 		diff = `	`
 	}
 	str := fmt.Sprintf(`
-		%sQuest[%s]{ID: %d, PreID: %d, MapID: %d, Danger: %.1f, Destiny: %d, Length: %d}`,
-		diff, quest.getName(), quest.ID, quest.PreID, quest.MapID, quest.Danger, quest.Destiny, quest.Length,
+		%sQuest[%s]{ID: %d, PreID: %d, MapID: %d, Danger: %.1f, Destiny: %d, Length: %d}
+		%s	%s`,
+		diff, quest.getName(), quest.ID, quest.PreID, quest.MapID, quest.Danger, quest.Destiny, quest.Length, diff, quest.Party.ToString(),
 	)
 	return str
 }

@@ -4,6 +4,7 @@ import "math/rand"
 import "time"
 import "fmt"
 import "math"
+import "reflect"
 
 var (
 	ran *rand.Rand
@@ -123,6 +124,16 @@ type RouletteNode struct {
 type Roulette []struct {
 	Weight int
 	Target interface{}
+}
+
+// Remove ...
+func (rou Roulette) Remove(target interface{}) {
+	for index := range rou {
+		if reflect.DeepEqual(rou[index].Target, target) {
+			rou = append(rou[:index], rou[index+1:]...)
+			break
+		}
+	}
 }
 
 // Get ...
