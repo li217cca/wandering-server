@@ -167,5 +167,8 @@ func (rou *Roulette) Get() interface{} {
 		}
 	}
 	fmt.Printf("Roulette.get error %v", rou)
-	return (*rou)[0].Target
+	if len(*rou) > 0 {
+		return (*rou)[0].Target
+	}
+	return 0
 }

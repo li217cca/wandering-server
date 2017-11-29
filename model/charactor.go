@@ -63,6 +63,8 @@ type Charactor struct {
 Char const
 */
 const (
+	// About Skill Weight
+	CharTypeDefaultID      = 0   // 缺省型
 	CharTypeAttackID       = 100 // 近战攻击型
 	CharTypeRemoteAttackID = 110 // 远程攻击型
 	CharTypeAssaultID      = 120 // 突击型
@@ -104,7 +106,15 @@ func NewCharactor(name string, skills []Skill) Charactor {
 }
 
 var (
-	CharSkillWeight = map[int]SkillWeight{
+	// 根据CharType决定技能权重
+	CharSkillWeight = map[int]SkillWeight{ // CharType
+		CharTypeDefaultID: SkillWeight{
+			Attack:  20,
+			Speed:   20,
+			Defence: 20,
+			Hinder:  20,
+			Support: 20,
+		},
 		CharTypeAttackID: SkillWeight{
 			Attack:  60,
 			Speed:   10,
@@ -154,9 +164,37 @@ var (
 			Hinder:  0,
 			Support: 10,
 		},
-	} // CharType
+	}
+	// EnemySpeciesSkillList ...
+	EnemySpeciesSkillList = map[int][]int{ // EnemyType / Chartype
+		EnemyTypeDefaultID: []int{
+			SkillSpeciesDefaultID,
+		},
+		EnemyTypePlantID: []int{
+			SkillSpeciesPlantID, SkillSpeciesPlantStrongID,
+		},
+		EnemyTypePhytozoonID: []int{
+			SkillSpeciesAnimalID, SkillSpeciesAnimalSpeedID, SkillSpeciesAnimalStrongID, SkillSpeciesAnimalWisdomID,
+		},
+		EnemyTypeCarnivoreID: []int{
+			SkillSpeciesAnimalID, SkillSpeciesAnimalSpeedID, SkillSpeciesAnimalStrongID, SkillSpeciesAnimalWisdomID,
+		},
+		EnemyTypeCivilizationID: []int{
+			SkillSpeciesHumanID, SkillSpeciesHumanSpeedID, SkillSpeciesHumanStrongID, SkillSpeciesAnimalWisdomID,
+		},
+		EnemyTypeCivilizationExileID: []int{
+			SkillSpeciesHumanID, SkillSpeciesHumanSpeedID, SkillSpeciesHumanStrongID,
+		},
+		EnemyTypeLegendID: []int{
+			SkillSpeciesLegendID,
+		},
+	}
 	EnemyThemeSkillList = map[int]map[int][]int{ // EnemyType / ThemeType
-		EnemyPlantID: {
+		EnemyTypeDefaultID: {
+			EnemyThemeDefaultID: []int{},
+		},
+		EnemyTypePlantID: {
+			EnemyThemeDefaultID: []int{},
 			EnemyThemeNormalID: []int{
 				SkillAttentionDefenceID,
 				SkillCounterAttackID, SkillCounterDamageIncreaseID,
@@ -180,7 +218,8 @@ var (
 				SkillRemoteAttackID, SkillMultiAttackID, SkillFieldAttackID,
 				SkillPoisonAttackID, SkillPoisonFieldID},
 		},
-		EnemyPhytozoonID: {
+		EnemyTypePhytozoonID: {
+			EnemyThemeDefaultID: []int{},
 			EnemyThemeNormalID: []int{
 				SkillAttentionDefenceID,
 				SkillCounterAttackID, SkillCounterDamageIncreaseID,
@@ -206,10 +245,10 @@ var (
 				SkillRemoteAttackID, SkillMultiAttackID, SkillFieldAttackID,
 				SkillPoisonAttackID, SkillPoisonFieldID},
 		},
-		EnemyCarnivoreID:         {},
-		EnemyCivilizationID:      {},
-		EnemyCivilizationExileID: {},
-		EnemyLegendID:            {},
+		EnemyTypeCarnivoreID:         {},
+		EnemyTypeCivilizationID:      {},
+		EnemyTypeCivilizationExileID: {},
+		EnemyTypeLegendID:            {},
 	}
 )
 

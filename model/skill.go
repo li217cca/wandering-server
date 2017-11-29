@@ -20,11 +20,11 @@ type Skill struct {
 
 // SkillWeight ...
 type SkillWeight struct {
-	Attack  int
-	Speed   int
-	Defence int
-	Hinder  int
-	Support int
+	Attack  int // 攻击
+	Speed   int // 速度
+	Defence int // 防御
+	Hinder  int // 异常
+	Support int // 辅助
 }
 
 // Skill const
@@ -33,37 +33,73 @@ const (
 	SkillBagWeightBaseID   = 10100 // 基础负重, 1 per level
 	SkillBagCapacityBaseID = 10110 // 基础打包, 1 per level
 
-	// special defence
-	SkillAttentionDefenceID = 700 // 专注防御, 防御增益 1% per level
-	SkillDebuffDecenceID    = 710 // 异常耐受, level/(level+50) * 100% 耐受
+	// Species
+	SkillSpeciesDefaultID      = 0     // 缺省种族
+	SkillSpeciesHumanID        = 20000 // 人类
+	SkillSpeciesHumanStrongID  = 20010 // 强壮人类
+	SkillSpeciesHumanSpeedID   = 20020 // 敏捷人类
+	SkillSpeciesHumanWisdomID  = 20030 // 智慧人类
+	SkillSpeciesPlantID        = 21000 // 植物
+	SkillSpeciesPlantStrongID  = 21010 // 粗壮植物
+	SkillSpeciesAnimalID       = 22000 // 动物
+	SkillSpeciesAnimalStrongID = 22010 // 强壮动物
+	SkillSpeciesAnimalSpeedID  = 22020 // 敏捷动物
+	SkillSpeciesAnimalWisdomID = 22020 // 智慧动物
+	// SkillSpeciesElementID = 23000 // 元素
+	// SkillSpeciesMachineID = 24000 // 机械
+	SkillSpeciesLegendID = 27000 // 传说动物
 
-	// special attack
-	SkillMultiAttackID   = 800 // 追加攻击, 1% per level
-	SkillFieldAttackID   = 810 // 全域攻击, level/(level+50) * 100%
-	SkillCritAttackID    = 820 // 致命攻击, level/(level+50) * 100%
-	SkillRemoteAttackID  = 830 // 远程攻击, 50% * level/(level+50) * 50%
-	SkillCounterAttackID = 850 // 反击, level/(level+50) * 100%
+	//  defence
+	SkillAttentionDefenceID = 700 // 专注防御, 防御增益 1% per level
+	SkillDebuffDecenceID    = 710 // 异常防御
+	SkillAssistDecenceID    = 730 // 协助防御
+	SkillCritDecenceID      = 740 // 致命防御
+
+	//  attack
+	SkillMultiAttackID           = 1000 // 追加攻击, 1% per level
+	SkillFieldAttackID           = 1010 // 全域攻击, level/(level+50) * 100%
+	SkillCritAttackID            = 1020 // 致命攻击, level/(level+50) * 100%
+	SkillCritAttackIncreaseID    = 1021 // 致命伤害增幅, 1% per level
+	SkillRemoteAttackID          = 1030 // 远程攻击, 50% * level/(level+50) * 50%
+	SkillCounterAttackID         = 1040 // 反击攻击
+	SkillCounterAttackIncreaseID = 1041 // 反击伤害增幅, 1% per level
 
 	// damage calc
-	SkillCritDamageIncreaseID    = 925 // 致命伤害增幅, 1% per level
-	SkillCruelDamageIncreaseID   = 930 // 残忍伤害增幅, 100% * (1-hpp) * 1% per level
-	SkillCounterDamageIncreaseID = 940 // 反击伤害增幅, 1% per level
+	SkillCruelAttackIncreaseID = 1230 // 残忍伤害增幅, 100% * (1-hpp) * 1% per level
 
-	// support
-	SkillPurifyTargetID = 2200 // 目标净化, 5% per level
-	SkillPurifyFieldID  = 2205 // 领域净化, 2% per level
-	SkillBariaTargetID  = 2210 // 目标屏障, 5% per level
-	SkillBariaFieldID   = 2205 // 领域屏障, 2% per level
+	// support skill
+	SkillKnowledgeID = 2100 // 知识，Support Up
 
-	// special support
-	SkillMagicTargetID = 2300 // 目标魔法, 1% per level
-	SkillMagicFieldID  = 2305 // 领域魔法, 1% per level
+	SkillPurifyTargetID = 2200 // 目标净化
+	SkillPurifyFieldID  = 2201 // 领域净化
+	SkillPurifySelfID   = 2202 // 自我净化
+
+	SkillBariaTargetID       = 2210 // 目标屏障
+	SkillBariaFieldID        = 2211 // 领域屏障
+	SkillBariaSelfID         = 2212 // 自我屏障
+	SkillBariaSelfOpeningID  = 2214 // 开幕自我屏障
+	SkillBariaFieldOpeningID = 2215 // 开幕领域屏障
+
+	SkillHealingTargetID = 2220 // 目标治愈
+	SkillHealingFieldID  = 2221 // 领域治愈
+	SkillHealingSelfID   = 2222 // 自我治愈
+
+	// attack magic
+	SkillMagicDamageSelfID = 1600 // 自我魔法增幅
+
+	SkillMagicTargetID = 1700 // 目标魔法, 1% per level
+	SkillMagicAttackID = 1701 // 攻击魔法, 1% per level
+	SkillMagicFieldID  = 1702 // 领域魔法, 1% per level
 
 	// hinder
-	SkillPoisonTargetID = 3200 // 目标猛毒, 5% per level
-	SkillPoisonAttackID = 3210 // 攻击猛毒, 5% per level
-	SkillPoisonFieldID  = 3220 // 领域猛毒, 2% per level
+	SkillPoisonTargetID = 3200 // 目标中毒, 5% per level
+	SkillPoisonAttackID = 3201 // 攻击中毒, 5% per level
+	SkillPoisonFieldID  = 3202 // 领域中毒, 5% per level
 
+	SkillSunderTargetID = 3210 // 目标破甲
+	SkillSunderAttackID = 3211 // 攻击破甲
+
+	SkillConfuseTargetID = 3220 // 目标混乱
 )
 
 // GetWeight [pure]
@@ -115,10 +151,6 @@ func (skill *Skill) TypeName() string {
 		return "基础负重"
 	case SkillBagCapacityBaseID:
 		return "基础打包"
-	case SkillHitPointIncreaseID:
-		return "体力增幅"
-	case SkillAttackIncreaseID:
-		return "攻击增幅"
 	}
 	return "未知类型技能"
 }

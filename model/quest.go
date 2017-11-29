@@ -31,70 +31,85 @@ type Quest struct {
 // AboutSize [pure]
 func (quest *Quest) AboutSize() int {
 	switch quest.QuestType {
-	case QuestBattleID:
+	case QuestTypeBattleID:
 		return 2
-	case QuestRaidID:
+	case QuestTypeRaidID:
 		return 6
-	case QuestMixedRaidID:
+	case QuestTypeMixedRaidID:
 		return 8
-	case QuestDungeonID:
+	case QuestTypeDungeonID:
 		return 23
-	case QuestMixedDungeonID:
+	case QuestTypeMixedDungeonID:
 		return 25
-	case QuestChaosDungeonID:
+	case QuestTypeChaosDungeonID:
 		return 15
 	}
-	return 0
+	return 1
 }
 
 // Quest const ...
 const (
-	EnemyDifficultyNormalID = 100
-	EnemyDifficultyEliteID  = 200
-	EnemyDifficultyBossID   = 300
-	EnemyDifficultyPrizeID  = 400 // 奖励
-	EnemyDifficultyFriendID = 500 // 友方
+	// About CharType
+	QuestDifficultyDefaultID = 0
+	QuestDifficultyNormalID  = 100
+	QuestDifficultyEliteID   = 200
+	QuestDifficultyBossID    = 300
+	QuestDifficultyPrizeID   = 400 // 奖励
+	QuestDifficultyFriendID  = 500 // 友方
 
+	// About Skill group
+	EnemyThemeDefaultID  = 0   // 缺省主题
 	EnemyThemeNormalID   = 100 // 普通
 	EnemyThemeMagicID    = 200 // 魔法
 	EnemyThemeScienceID  = 300 // 科学
 	EnemyThemePunkID     = 400 // 朋克
 	EnemyThemeDisasterID = 500 // 灾祸
 
-	EnemyPlantID             = 100 // 植物
-	EnemyPhytozoonID         = 200 // 素食动物
-	EnemyCarnivoreID         = 300 // 肉食动物
-	EnemyCivilizationID      = 400 // 文明
-	EnemyCivilizationExileID = 410 // 放逐文明
-	EnemyLegendID            = 500 // 传说
+	// About SpecialSkill, Skill group
+	EnemyTypeDefaultID           = 0   // 缺省物种
+	EnemyTypePlantID             = 100 // 植物
+	EnemyTypePhytozoonID         = 200 // 素食动物
+	EnemyTypeCarnivoreID         = 300 // 肉食动物
+	EnemyTypeCivilizationID      = 400 // 文明
+	EnemyTypeCivilizationExileID = 410 // 放逐文明
+	EnemyTypeLegendID            = 500 // 传说
 
-	QuestBattleID         = 200 // [1,   2] 一种种族，概率Prize
-	QuestRaidID           = 300 // [3,   9] 一种种族，概率Prize，概率BOSS
-	QuestMixedRaidID      = 310 // [4,  12] 几种种族，概率Prize，概率BOSS
-	QuestDungeonID        = 400 // [9,  36] 一种种族，少量Prize，少量BOSS
-	QuestMixedDungeonID   = 410 // [10, 40] 几种种族，少量Prize，少量BOSS
-	QuestChaosDungeonID   = 430 // [5,  25] 几种Elite/BOSS，Prize
-	QuestAncientDungeonID = 450 // [X,   X] 远古地牢 // TODO
+	/**
+	 * AboutSize
+	 * randomQuestLength
+	 * randomQuestType
+	 * isMixed
+	 * QuestTypeToString
+	 */
+	// About Battle size, Difficulty, CharType weight
+	QuestTypeDefaultID        = 0
+	QuestTypeBattleID         = 200 // [1,   2] 一种种族，概率Prize
+	QuestTypeRaidID           = 300 // [3,   9] 一种种族，概率Prize，概率BOSS
+	QuestTypeMixedRaidID      = 310 // [4,  12] 几种种族，概率Prize，概率BOSS
+	QuestTypeDungeonID        = 400 // [9,  36] 一种种族，少量Prize，少量BOSS
+	QuestTypeMixedDungeonID   = 410 // [10, 40] 几种种族，少量Prize，少量BOSS
+	QuestTypeChaosDungeonID   = 430 // [5,  25] 几种Elite/BOSS，Prize
+	QuestTypeAncientDungeonID = 450 // [X,   X] 远古地牢 // TODO
 )
 
 func randomQuestLength(questType int) int {
 	switch questType {
-	case QuestBattleID:
+	case QuestTypeBattleID:
 		return common.Float(10, 19) / 10
-	case QuestRaidID:
+	case QuestTypeRaidID:
 		return int(common.GaussianlRandF3(6, 3))
-	case QuestMixedRaidID:
+	case QuestTypeMixedRaidID:
 		return int(common.GaussianlRandF3(8, 4))
-	case QuestDungeonID:
+	case QuestTypeDungeonID:
 		return int(common.GaussianlRandF3(23, 15))
-	case QuestMixedDungeonID:
+	case QuestTypeMixedDungeonID:
 		return int(common.GaussianlRandF3(25, 16))
-	case QuestChaosDungeonID:
+	case QuestTypeChaosDungeonID:
 		return int(common.GaussianlRandF3(15, 10))
-	case QuestAncientDungeonID:
+	case QuestTypeAncientDungeonID:
 		return 0
 	}
-	return 0
+	return 1
 }
 
 // randomQuestType [pure]
@@ -108,24 +123,28 @@ func randomQuestType(lucky float64, landArea float64) int {
 	landAreaAddition := math.Sqrt(landArea / 1500)
 	luckyAddition := math.Sqrt(lucky / 30)
 	rou := common.Roulette{
-		{10000, QuestBattleID},
-		{int(500 * landAreaAddition), QuestRaidID},
-		{int(150 * landAreaAddition), QuestMixedRaidID},
-		{int(100 * landAreaAddition * luckyAddition), QuestDungeonID},
-		{int(30 * landAreaAddition * luckyAddition), QuestMixedDungeonID},
-		{int(20 * landAreaAddition * luckyAddition), QuestChaosDungeonID},
-		{0, QuestAncientDungeonID},
+		{10000, QuestTypeBattleID},
+		{int(500 * landAreaAddition), QuestTypeRaidID},
+		{int(150 * landAreaAddition), QuestTypeMixedRaidID},
+		{int(100 * landAreaAddition * luckyAddition), QuestTypeDungeonID},
+		{int(30 * landAreaAddition * luckyAddition), QuestTypeMixedDungeonID},
+		{int(20 * landAreaAddition * luckyAddition), QuestTypeChaosDungeonID},
+		{0, QuestTypeAncientDungeonID},
 	}
-	return rou.Get().(int)
+	get, ok := rou.Get().(int)
+	if ok {
+		return get
+	}
+	return QuestTypeDefaultID
 }
 
 func (quest *Quest) isMixed() bool {
 	switch quest.QuestType {
-	case QuestMixedRaidID:
+	case QuestTypeMixedRaidID:
 		return true
-	case QuestMixedDungeonID:
+	case QuestTypeMixedDungeonID:
 		return true
-	case QuestChaosDungeonID:
+	case QuestTypeChaosDungeonID:
 		return true
 	}
 	return false
@@ -142,15 +161,19 @@ func (quest *Quest) randomNextEnemyType(res *Resource) int {
 	}
 	disasterAddition := math.Sqrt(res.DisasterResource / 100)
 	rou := common.Roulette{
-		{int(100 * math.Sqrt(res.PlantResource/10000*disasterAddition)), EnemyPlantID},
-		{int(100 * math.Sqrt(res.PhytozoonResource/1000)), EnemyPhytozoonID},
-		{int(100 * math.Sqrt(res.CarnivoreResource/200)), EnemyCarnivoreID},
-		{int(100 * math.Sqrt(res.CivilizationResource/200)), EnemyCivilizationID},
-		{int(100 * math.Sqrt(res.CivilizationResource/1000)), EnemyCivilizationExileID},
-		{int(100 * math.Sqrt(res.LegendResource/1000)), EnemyLegendID},
+		{int(100 * math.Sqrt(res.PlantResource/10000*disasterAddition)), EnemyTypePlantID},
+		{int(100 * math.Sqrt(res.PhytozoonResource/1000)), EnemyTypePhytozoonID},
+		{int(100 * math.Sqrt(res.CarnivoreResource/200)), EnemyTypeCarnivoreID},
+		{int(100 * math.Sqrt(res.CivilizationResource/200)), EnemyTypeCivilizationID},
+		{int(100 * math.Sqrt(res.CivilizationResource/1000)), EnemyTypeCivilizationExileID},
+		{int(100 * math.Sqrt(res.LegendResource/1000)), EnemyTypeLegendID},
 		{int(notMix), quest.EnemyType},
 	}
-	return rou.Get().(int)
+	get, ok := rou.Get().(int)
+	if ok {
+		return get
+	}
+	return EnemyTypeDefaultID
 }
 
 // randomNextThemeType [pure]
@@ -171,7 +194,11 @@ func (quest *Quest) randomNextThemeType(res *Resource) int {
 		{int(100 * math.Sqrt(res.DisasterResource/1000)), EnemyThemeDisasterID},
 		{int(notMix), quest.ThemeType},
 	}
-	return rou.Get().(int)
+	get, ok := rou.Get().(int)
+	if ok {
+		return get
+	}
+	return EnemyThemeDefaultID
 }
 
 // randomNextDifficulty [pure]
@@ -181,13 +208,17 @@ func (quest *Quest) randomNextDifficulty(lucky float64) int {
 	sizeAddition := math.Sqrt(float64(quest.AboutSize()) / 7)
 	lengthAddition := 1 / math.Sqrt(float64(quest.Length+1))
 	rou := common.Roulette{
-		{int(100), EnemyDifficultyNormalID},
-		{int(5 + 50*destinyAddition), EnemyDifficultyEliteID},
-		{int(100 * destinyAddition * sizeAddition * lengthAddition), EnemyDifficultyBossID},
-		{int(5 + 50*destinyAddition*luckyAddition*lengthAddition), EnemyDifficultyPrizeID},
-		{int(10 * luckyAddition * sizeAddition * lengthAddition), EnemyDifficultyFriendID},
+		{int(100), QuestDifficultyNormalID},
+		{int(5 + 50*destinyAddition), QuestDifficultyEliteID},
+		{int(100 * destinyAddition * sizeAddition * lengthAddition), QuestDifficultyBossID},
+		{int(5 + 50*destinyAddition*luckyAddition*lengthAddition), QuestDifficultyPrizeID},
+		{int(10 * luckyAddition * sizeAddition * lengthAddition), QuestDifficultyFriendID},
 	}
-	return rou.Get().(int)
+	get, ok := rou.Get().(int)
+	if ok {
+		return get
+	}
+	return QuestDifficultyDefaultID
 }
 
 // GetDistiny [pure]
@@ -202,23 +233,23 @@ func (quest *Quest) GetDistiny() int {
 		destiny *= 0.9
 	}
 	switch quest.Difficulty {
-	case EnemyDifficultyPrizeID:
+	case QuestDifficultyPrizeID:
 		destiny *= 0.1
-	case EnemyDifficultyFriendID:
+	case QuestDifficultyFriendID:
 		destiny *= 0.1
-	case EnemyDifficultyEliteID:
+	case QuestDifficultyEliteID:
 		destiny *= 2
-	case EnemyDifficultyBossID:
+	case QuestDifficultyBossID:
 		destiny *= 5
 	}
 	switch quest.EnemyType {
-	case EnemyLegendID:
+	case EnemyTypeLegendID:
 		destiny *= 2
-	case EnemyCivilizationExileID:
+	case EnemyTypeCivilizationExileID:
 		destiny *= 1.3
-	case EnemyCivilizationID:
+	case EnemyTypeCivilizationID:
 		destiny *= 1.3
-	case EnemyPlantID:
+	case EnemyTypePlantID:
 		destiny *= 0.7
 	}
 	return int(destiny)
@@ -228,12 +259,12 @@ func (quest *Quest) GetDistiny() int {
 func (quest *Quest) UseDistiny(getDestiny int) int {
 	destiny := float64(quest.Destiny + getDestiny)
 	switch quest.Difficulty {
-	case EnemyDifficultyFriendID:
+	case QuestDifficultyFriendID:
 		r := common.GetRand()
 		return int(common.FloatF(0, destiny*r.Float64()*r.Float64()*r.Float64()))
-	case EnemyDifficultyBossID:
+	case QuestDifficultyBossID:
 		return int(common.FloatF(destiny*0.99, destiny))
-	case EnemyDifficultyPrizeID:
+	case QuestDifficultyPrizeID:
 		return int(common.FloatF(destiny*0.1, destiny*0.8))
 	}
 	return int(common.FloatF(0, destiny*0.05))
@@ -279,19 +310,19 @@ func (mp *Map) GenerateQuest(lucky float64) Quest {
 // QuestTypeToString [pure]
 func (quest *Quest) QuestTypeToString() string {
 	switch quest.QuestType {
-	case QuestBattleID:
+	case QuestTypeBattleID:
 		return "战斗"
-	case QuestRaidID:
+	case QuestTypeRaidID:
 		return "突袭"
-	case QuestMixedRaidID:
+	case QuestTypeMixedRaidID:
 		return "混合突袭"
-	case QuestDungeonID:
+	case QuestTypeDungeonID:
 		return "地牢"
-	case QuestMixedDungeonID:
+	case QuestTypeMixedDungeonID:
 		return "混合地牢"
-	case QuestChaosDungeonID:
+	case QuestTypeChaosDungeonID:
 		return "混沌地牢"
-	case QuestAncientDungeonID:
+	case QuestTypeAncientDungeonID:
 		return "远古地牢"
 	}
 	return "未知Quest"
@@ -300,17 +331,17 @@ func (quest *Quest) QuestTypeToString() string {
 // EnemyTypeToString [pure]
 func (quest *Quest) EnemyTypeToString() string {
 	switch quest.EnemyType {
-	case EnemyPlantID:
+	case EnemyTypePlantID:
 		return "植物"
-	case EnemyPhytozoonID:
+	case EnemyTypePhytozoonID:
 		return "素食动物"
-	case EnemyCarnivoreID:
+	case EnemyTypeCarnivoreID:
 		return "肉食动物"
-	case EnemyCivilizationID:
+	case EnemyTypeCivilizationID:
 		return "文明"
-	case EnemyCivilizationExileID:
+	case EnemyTypeCivilizationExileID:
 		return "放逐文明"
-	case EnemyLegendID:
+	case EnemyTypeLegendID:
 		return "传说"
 	}
 	return "未知种族"
@@ -336,15 +367,15 @@ func (quest *Quest) ThemeTypeToString() string {
 // DifficultyToString [pure]
 func (quest *Quest) DifficultyToString() string {
 	switch quest.Difficulty {
-	case EnemyDifficultyNormalID:
+	case QuestDifficultyNormalID:
 		return ""
-	case EnemyDifficultyEliteID:
+	case QuestDifficultyEliteID:
 		return "精英"
-	case EnemyDifficultyBossID:
+	case QuestDifficultyBossID:
 		return "BOSS"
-	case EnemyDifficultyFriendID:
+	case QuestDifficultyFriendID:
 		return "友好"
-	case EnemyDifficultyPrizeID:
+	case QuestDifficultyPrizeID:
 		return "奖励"
 	}
 	return "未知难度"
@@ -352,7 +383,7 @@ func (quest *Quest) DifficultyToString() string {
 
 func (quest *Quest) getName() string {
 	name := quest.DifficultyToString() + quest.QuestTypeToString()
-	if !(quest.Difficulty == EnemyDifficultyFriendID || quest.Difficulty == EnemyDifficultyPrizeID) {
+	if !(quest.Difficulty == QuestDifficultyFriendID || quest.Difficulty == QuestDifficultyPrizeID) {
 		name = quest.ThemeTypeToString() +
 			quest.EnemyTypeToString() + name
 	}
